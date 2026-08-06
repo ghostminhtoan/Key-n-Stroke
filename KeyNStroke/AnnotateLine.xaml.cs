@@ -104,7 +104,6 @@ namespace KeyNStroke
 
             if (isDown && raw_e.Action == MouseAction.Move)
             {
-                raw_e.preventDefault = true;
                 this.Dispatcher.BeginInvoke((Action)(() =>
                 {
                     if (s == null || !isDown) return;
