@@ -438,7 +438,7 @@
                                 <Hyperlink Click="Hyperlink_ResetToggleKeystrokeHistoryShortcut">Reset to <Run x:Name="ToggleKeystrokeHistoryShortcutDefault"></Run></Hyperlink></TextBlock>
                                 <TextBlock TextWrapping="Wrap"
                                            Margin="5,10,0,0">
-                                Toggle UI (Settings mode)</TextBlock>
+                                Toggle Settings Window</TextBlock>
                                 <TextBlock TextWrapping="Wrap"
                                            Margin="15,3,0,0">
                                 <Run Text="{Binding ToggleUiShortcut}" />

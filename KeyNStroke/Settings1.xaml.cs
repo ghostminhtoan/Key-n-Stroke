@@ -294,7 +294,7 @@ namespace KeyNStroke
 
         private void Hyperlink_TriggerToggleUiShortcut(object sender, RoutedEventArgs e)
         {
-            settings.EnableSettingsMode = !settings.EnableSettingsMode;
+            this.Close();
         }
 
         #endregion

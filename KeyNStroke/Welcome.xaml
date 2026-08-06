@@ -48,7 +48,7 @@
             <TextBlock>
                 <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding ToggleKeystrokeHistoryShortcut, Mode=OneWay}" /></Span><Run Text=" to toggle keystroke history visibility." />
                 <LineBreak />
-                <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding ToggleUiShortcut, Mode=OneWay}" /></Span><Run Text=" to toggle Settings Mode UI visibility." />
+                <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding ToggleUiShortcut, Mode=OneWay}" /></Span><Run Text=" to toggle Settings Window visibility." />
             </TextBlock>
         </StackPanel>
         <Button x:Name="ButtonCheckForUpdates"

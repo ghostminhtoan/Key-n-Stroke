@@ -212,7 +212,14 @@ namespace KeyNStroke
             }
             if (ToggleUiShortcut != null && KeystrokeDisplay.ShortcutMatches(ToggleUiShortcut, pressed))
             {
-                mySettings.EnableSettingsMode = !mySettings.EnableSettingsMode;
+                if (settingsWindow != null)
+                {
+                    settingsWindow.Close();
+                }
+                else
+                {
+                    showSettingsWindow();
+                }
                 return true;
             }
             return false;
