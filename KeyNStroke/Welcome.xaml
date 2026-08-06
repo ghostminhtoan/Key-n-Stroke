@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:KeyNStroke"
         mc:Ignorable="d"
         Title="Welcome"
-        Height="440.617"
+        Height="500"
         Width="741.54"
         Icon="Resources/app.ico"
         WindowStartupLocation="CenterScreen">
@@ -17,7 +17,7 @@
           Margin="10,10,10,10"
           VerticalAlignment="Stretch"
           x:Name="layout_root">
-        <StackPanel Margin="10,10,-0.333,163.333">
+        <StackPanel Margin="10,10,10,80">
             <TextBlock TextWrapping="Wrap">
                 <Span FontSize="24">
                     <Run Text="Welcome to Key'n'Strokes " /><Run x:Name="VersionInfo" />
@@ -58,7 +58,9 @@
                 VerticalAlignment="Bottom"
                 Width="129"
                 Height="24" />
-        <TextBlock Margin="10,299,-0.333,52.333"
+        <TextBlock Margin="10,0,0,45"
+                   VerticalAlignment="Bottom"
+                   HorizontalAlignment="Left"
                    TextWrapping="Wrap">
             <Hyperlink RequestNavigate="Hyperlink_RequestNavigate_README"
                        NavigateUri="none://dummy">Documentation</Hyperlink>

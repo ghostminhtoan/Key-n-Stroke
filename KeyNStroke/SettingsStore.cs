@@ -250,17 +250,29 @@ namespace KeyNStroke
 
         public SettingsStore()
         {
-            string portablePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
+            string portableDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".portable");
+            string portablePath = Path.Combine(portableDir, "settings.json");
+            string oldRootPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
             string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Key-n-Stroke", "settings.json");
 
-            if (File.Exists(portablePath) || !File.Exists(appDataPath))
+            if (!Directory.Exists(portableDir))
             {
-                configpath = portablePath;
+                try { Directory.CreateDirectory(portableDir); } catch { }
             }
-            else
+
+            if (!File.Exists(portablePath))
             {
-                configpath = appDataPath;
+                if (File.Exists(oldRootPath))
+                {
+                    try { File.Copy(oldRootPath, portablePath, true); } catch { }
+                }
+                else if (File.Exists(appDataPath))
+                {
+                    try { File.Copy(appDataPath, portablePath, true); } catch { }
+                }
             }
+
+            configpath = portablePath;
         }
 
         string configpath;
@@ -525,17 +537,24 @@ namespace KeyNStroke
             set { i.buttonIndicatorShowModifiers = value; OnSettingChanged("ButtonIndicatorShowModifiers"); }
         }
 
-        public bool ButtonIndicatorUseCustomIconsDefault = false;
+        public bool ButtonIndicatorUseCustomIconsDefault = true;
         public bool ButtonIndicatorUseCustomIcons
         {
             get { return Or(i.buttonIndicatorUseCustomIcons, ButtonIndicatorUseCustomIconsDefault); }
             set { i.buttonIndicatorUseCustomIcons = value; OnSettingChanged("ButtonIndicatorUseCustomIcons"); }
         }
 
-        public string ButtonIndicatorCustomIconsFolderDefault = "";
+        public string ButtonIndicatorCustomIconsFolderDefault = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".portable", "mouse");
         public string ButtonIndicatorCustomIconsFolder
         {
-            get { return Or(i.buttonIndicatorCustomIconsFolder, ButtonIndicatorCustomIconsFolderDefault); }
+            get {
+                string folder = Or(i.buttonIndicatorCustomIconsFolder, ButtonIndicatorCustomIconsFolderDefault);
+                if (string.IsNullOrEmpty(folder))
+                {
+                    folder = ButtonIndicatorCustomIconsFolderDefault;
+                }
+                return folder;
+            }
             set { i.buttonIndicatorCustomIconsFolder = value; OnSettingChanged("ButtonIndicatorCustomIconsFolder"); }
         }
 
