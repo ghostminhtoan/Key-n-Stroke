@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -323,33 +324,22 @@ namespace KeyNStroke
 
         private void OnButtonCustomIconsSelectFolder(object sender, RoutedEventArgs e)
         {
-            using (System.Windows.Forms.FolderBrowserDialog dlg = new System.Windows.Forms.FolderBrowserDialog())
+            IntPtr handle = new WindowInteropHelper(this).Handle;
+            string selectedPath = VistaFolderBrowser.ShowDialog(handle, "Select folder with custom icons", settings.ButtonIndicatorCustomIconsFolder);
+            if (!string.IsNullOrEmpty(selectedPath))
             {
-                dlg.Description = "Select folder with custom icons";
-                dlg.SelectedPath = settings.ButtonIndicatorCustomIconsFolder;
-                dlg.ShowNewFolderButton = true;
-                System.Windows.Forms.DialogResult result = dlg.ShowDialog();
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    settings.ButtonIndicatorCustomIconsFolder = dlg.SelectedPath;
-                }
+                settings.ButtonIndicatorCustomIconsFolder = selectedPath;
             }
         }
 
         private void OnButtonExportBuiltinIcons(object sender, RoutedEventArgs e)
         {
-            using (System.Windows.Forms.FolderBrowserDialog dlg = new System.Windows.Forms.FolderBrowserDialog())
+            IntPtr handle = new WindowInteropHelper(this).Handle;
+            string selectedPath = VistaFolderBrowser.ShowDialog(handle, "Select folder for export", settings.ButtonIndicatorCustomIconsFolder);
+            if (!string.IsNullOrEmpty(selectedPath))
             {
-                dlg.Description = "Select folder for export";
-                // dlg.SelectedPath = settings.ButtonIndicatorCustomIconsFolder;
-                dlg.ShowNewFolderButton = true;
-                System.Windows.Forms.DialogResult result = dlg.ShowDialog();
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    ImageResources.ExportBuiltinRessources(dlg.SelectedPath);
-                }
+                ImageResources.ExportBuiltinRessources(selectedPath);
             }
-            
         }
 
         private void OnClickCustomIconsHelp(object sender, RoutedEventArgs e)
