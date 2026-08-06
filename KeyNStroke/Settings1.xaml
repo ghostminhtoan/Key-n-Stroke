@@ -129,6 +129,8 @@
                                       IsChecked="{Binding EnableWindowFade}">Hide window when empty</CheckBox>
                             <CheckBox x:Name="cb_periodictopmost"
                                       IsChecked="{Binding PeriodicTopmost}">Put on top periodically</CheckBox>
+                            <CheckBox x:Name="cb_globalkey"
+                                      IsChecked="{Binding GlobalKey}">global key</CheckBox>
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Margin="5"

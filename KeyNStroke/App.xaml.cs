@@ -300,6 +300,12 @@ namespace KeyNStroke
                 case "ToggleUiShortcut":
                     SetToggleUiShortcut(mySettings.ToggleUiShortcut);
                     break;
+                case "GlobalKey":
+                    if (myKeyboardHook != null)
+                    {
+                        myKeyboardHook.GlobalKeyEnabled = mySettings.GlobalKey;
+                    }
+                    break;
                 case "Standby":
                     OnCursorIndicatorSettingChanged();
                     OnButtonIndicatorSettingChanged();

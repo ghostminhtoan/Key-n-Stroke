@@ -236,6 +236,7 @@ namespace KeyNStroke
         [DataMember] public Nullable<bool> welcomeOnStartup = null;
         [DataMember] public String toggleKeystrokeHistoryShortcut = null;
         [DataMember] public String toggleUiShortcut = null;
+        [DataMember] public Nullable<bool> globalKey = null;
 
 
     }
@@ -674,6 +675,13 @@ namespace KeyNStroke
             set { i.toggleUiShortcut = value; OnSettingChanged("ToggleUiShortcut"); }
         }
 
+        public bool GlobalKeyDefault = true;
+        public bool GlobalKey
+        {
+            get { return Or(i.globalKey, GlobalKeyDefault); }
+            set { i.globalKey = value; OnSettingChanged("GlobalKey"); }
+        }
+
         // Add new settings also to method CallPropertyChangedForAllProperties()
 
         #endregion
@@ -744,6 +752,7 @@ namespace KeyNStroke
                 PropertyChanged(this, new PropertyChangedEventArgs("WelcomeOnStartup"));
                 PropertyChanged(this, new PropertyChangedEventArgs("ToggleKeystrokeHistoryShortcut"));
                 PropertyChanged(this, new PropertyChangedEventArgs("ToggleUiShortcut"));
+                PropertyChanged(this, new PropertyChangedEventArgs("GlobalKey"));
 
             }
         }
@@ -879,6 +888,7 @@ Standby:                        {Standby}
 WelcomeOnStartup:               {WelcomeOnStartup}
 ToggleKeystrokeHistoryShortcut: {ToggleKeystrokeHistoryShortcut}
 ToggleUiShortcut:               {ToggleUiShortcut}
+GlobalKey:                      {GlobalKey}
 ";
         }
 
