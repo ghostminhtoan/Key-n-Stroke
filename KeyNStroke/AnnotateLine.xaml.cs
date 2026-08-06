@@ -266,6 +266,7 @@ namespace KeyNStroke
             }
 
             isDragging = true;
+            mainGrid.CaptureMouse();
             InitPreviewElement(startPoint);
         }
 
@@ -279,13 +280,17 @@ namespace KeyNStroke
 
         private void Grid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (!isDrawingActive || !isDragging) return;
+            if (!isDrawingActive) return;
 
-            isDragging = false;
-            if (currentPreviewElement != null)
+            if (isDragging)
             {
-                drawnElements.Add(currentPreviewElement);
-                currentPreviewElement = null;
+                isDragging = false;
+                try { mainGrid.ReleaseMouseCapture(); } catch { }
+                if (currentPreviewElement != null)
+                {
+                    drawnElements.Add(currentPreviewElement);
+                    currentPreviewElement = null;
+                }
             }
         }
 

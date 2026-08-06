@@ -146,11 +146,14 @@ namespace KeyNStroke
             if (settingsWindow == null)
             {
                 settingsWindow = new Settings1(mySettings, myKeystrokeConverter);
-                settingsWindow.Show();
-            } else
-            {
-                settingsWindow.Activate();
             }
+            if (settingsWindow.WindowState == WindowState.Minimized)
+            {
+                settingsWindow.WindowState = WindowState.Normal;
+            }
+            settingsWindow.Show();
+            settingsWindow.Activate();
+            settingsWindow.Focus();
         }
 
         public void onSettingsWindowClosed()
@@ -212,7 +215,7 @@ namespace KeyNStroke
             }
             if (ToggleUiShortcut != null && KeystrokeDisplay.ShortcutMatches(ToggleUiShortcut, pressed))
             {
-                if (settingsWindow != null)
+                if (settingsWindow != null && settingsWindow.IsVisible && settingsWindow.WindowState != WindowState.Minimized)
                 {
                     settingsWindow.Close();
                 }
