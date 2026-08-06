@@ -64,7 +64,7 @@ namespace KeyNStroke
             SetAnnotateLineShortcut(s.AnnotateLineShortcut);
             windowHandle = new WindowInteropHelper(this).Handle;
             SetFormStyles();
-            this.Hide();
+            UpdateColorSelectionUI();
         }
 
         #region Shortcut & Toggle
@@ -144,6 +144,16 @@ namespace KeyNStroke
             }
         }
 
+        private void UpdateColorSelectionUI()
+        {
+            if (btnCustomColor != null)
+            {
+                btnCustomColor.Background = new SolidColorBrush(currentColor);
+                double brightness = (currentColor.R * 0.299 + currentColor.G * 0.587 + currentColor.B * 0.114) / 255.0;
+                btnCustomColor.Foreground = brightness > 0.5 ? Brushes.Black : Brushes.White;
+            }
+        }
+
         private void Color_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag != null)
@@ -151,6 +161,7 @@ namespace KeyNStroke
                 if (ColorConverter.ConvertFromString(btn.Tag.ToString()) is Color c)
                 {
                     currentColor = c;
+                    UpdateColorSelectionUI();
                 }
             }
         }
@@ -164,6 +175,7 @@ namespace KeyNStroke
                 if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     currentColor = Color.FromArgb(dlg.Color.A, dlg.Color.R, dlg.Color.G, dlg.Color.B);
+                    UpdateColorSelectionUI();
                 }
             }
         }
