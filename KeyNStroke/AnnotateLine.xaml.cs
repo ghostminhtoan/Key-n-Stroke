@@ -155,6 +155,19 @@ namespace KeyNStroke
             }
         }
 
+        private void CustomColorPicker_Click(object sender, RoutedEventArgs e)
+        {
+            using (var dlg = new System.Windows.Forms.ColorDialog())
+            {
+                dlg.Color = System.Drawing.Color.FromArgb(currentColor.A, currentColor.R, currentColor.G, currentColor.B);
+                dlg.FullOpen = true;
+                if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    currentColor = Color.FromArgb(dlg.Color.A, dlg.Color.R, dlg.Color.G, dlg.Color.B);
+                }
+            }
+        }
+
         private void Thickness_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (comboThickness?.SelectedItem is ComboBoxItem item && item.Tag != null)

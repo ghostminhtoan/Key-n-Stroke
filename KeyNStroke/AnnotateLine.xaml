@@ -129,13 +129,12 @@
 
                 <Rectangle Width="1" Height="20" Fill="#44FFFFFF" Margin="6,0"/>
 
-                <!-- Color Palette -->
-                <Button x:Name="btnColorRed" Background="#FF4D4D" Style="{StaticResource ColorPaletteBtn}" Click="Color_Click" Tag="#FF4D4D" ToolTip="Red"/>
-                <Button x:Name="btnColorGreen" Background="#7EEF84" Style="{StaticResource ColorPaletteBtn}" Click="Color_Click" Tag="#7EEF84" ToolTip="Green"/>
-                <Button x:Name="btnColorBlue" Background="#4D94FF" Style="{StaticResource ColorPaletteBtn}" Click="Color_Click" Tag="#4D94FF" ToolTip="Blue"/>
-                <Button x:Name="btnColorYellow" Background="#FFEB3B" Style="{StaticResource ColorPaletteBtn}" Click="Color_Click" Tag="#FFEB3B" ToolTip="Yellow"/>
+                <!-- Color Palette (4 Default Colors + Color Picker) -->
                 <Button x:Name="btnColorWhite" Background="#FFFFFF" Style="{StaticResource ColorPaletteBtn}" Click="Color_Click" Tag="#FFFFFF" ToolTip="White"/>
                 <Button x:Name="btnColorBlack" Background="#000000" Style="{StaticResource ColorPaletteBtn}" Click="Color_Click" Tag="#000000" ToolTip="Black"/>
+                <Button x:Name="btnColorDarkBlue" Background="#003366" Style="{StaticResource ColorPaletteBtn}" Click="Color_Click" Tag="#003366" ToolTip="Dark Blue"/>
+                <Button x:Name="btnColorCyan" Background="#00FFFF" Style="{StaticResource ColorPaletteBtn}" Click="Color_Click" Tag="#00FFFF" ToolTip="Cyan"/>
+                <Button x:Name="btnCustomColor" Content="🎨" Style="{StaticResource ToolbarActionBtn}" Click="CustomColorPicker_Click" ToolTip="Choose Custom Color"/>
 
                 <Rectangle Width="1" Height="20" Fill="#44FFFFFF" Margin="6,0"/>
 
