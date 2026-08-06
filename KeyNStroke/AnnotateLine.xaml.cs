@@ -2,36 +2,50 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using System.Windows.Media.Effects;
 using System.Windows.Shapes;
-using static KeyNStroke.NativeMethodsMouse;
 
 namespace KeyNStroke
 {
-    /// <summary>
-    /// Interaktionslogik für AnnotateLine.xaml
-    /// </summary>
     public partial class AnnotateLine : Window
     {
+        private enum ToolType
+        {
+            Pencil,
+            Arrow,
+            Rectangle,
+            Ellipse,
+            Highlighter,
+            Badge,
+            Text
+        }
 
-        IMouseRawEventProvider m;
-        IKeystrokeEventProvider k;
-        SettingsStore s;
-        IntPtr windowHandle;
-        bool isDown;
-        POINT startCursorPosition = new POINT(0, 0);
-        POINT endCursorPosition = new POINT(0, 0);
-        bool nextClickDraws = false;
-        bool nextClickHides = false;
+        private IMouseRawEventProvider m;
+        private IKeystrokeEventProvider k;
+        private SettingsStore s;
+        private IntPtr windowHandle;
+
+        private bool isDrawingActive = false;
+        private bool isDragging = false;
+        private Point startPoint;
+        private UIElement currentPreviewElement = null;
+
+        private ToolType currentTool = ToolType.Pencil;
+        private Color currentColor = (Color)ColorConverter.ConvertFromString("#7EEF84");
+        private double currentThickness = 4.0;
+        private int badgeCounter = 1;
+
+        private readonly List<UIElement> drawnElements = new List<UIElement>();
+
+        [DllImport("user32.dll")]
+        private static extern short GetKeyState(int vKey);
+        private const int VK_SHIFT = 0x10;
 
         public AnnotateLine(IMouseRawEventProvider m, IKeystrokeEventProvider k, SettingsStore s)
         {
@@ -41,34 +55,42 @@ namespace KeyNStroke
             this.s = s;
             this.k = k;
 
-            s.PropertyChanged += settingChanged;
+            s.PropertyChanged += SettingChanged;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             s.CallPropertyChangedForAllProperties();
-            m.MouseEvent += m_MouseEvent;
-            this.k.KeystrokeEvent += m_KeystrokeEvent;
+            if (this.k != null)
+            {
+                this.k.KeystrokeEvent += M_KeystrokeEvent;
+            }
             windowHandle = new WindowInteropHelper(this).Handle;
             SetFormStyles();
         }
 
-        #region Shortcut
+        #region Shortcut & Toggle
 
         public string AnnotateLineShortcut;
 
-        void m_KeystrokeEvent(KeystrokeEventArgs e)
+        private void M_KeystrokeEvent(KeystrokeEventArgs e)
         {
             if (s == null) return;
             string pressed = e.ShortcutIdentifier();
-            e.raw.preventDefault = e.raw.preventDefault || CheckForTrigger(pressed);
+            if (CheckForTrigger(pressed))
+            {
+                e.raw.preventDefault = true;
+            }
         }
 
         private bool CheckForTrigger(string pressed)
         {
             if (AnnotateLineShortcut != null && KeystrokeDisplay.ShortcutMatches(AnnotateLineShortcut, pressed))
             {
-                nextClickDraws = true;
+                this.Dispatcher.BeginInvoke((Action)(() =>
+                {
+                    ToggleDrawingMode();
+                }));
                 return true;
             }
             return false;
@@ -86,80 +108,31 @@ namespace KeyNStroke
             }
         }
 
-        #endregion
-
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        private static extern short GetKeyState(int vKey);
-        private const int VK_SHIFT = 0x10;
-
-        private void m_MouseEvent(MouseRawEventArgs raw_e)
+        public void ToggleDrawingMode()
         {
-            if (s == null) return;
-            if (!isDown && nextClickHides && raw_e.Action == MouseAction.Down)
+            isDrawingActive = !isDrawingActive;
+            if (isDrawingActive)
             {
-                raw_e.preventDefault = true;
-                nextClickHides = false;
-                this.Hide();
-            }
+                this.Left = SystemParameters.VirtualScreenLeft;
+                this.Top = SystemParameters.VirtualScreenTop;
+                this.Width = SystemParameters.VirtualScreenWidth;
+                this.Height = SystemParameters.VirtualScreenHeight;
 
-            if (isDown && raw_e.Action == MouseAction.Move)
-            {
-                this.Dispatcher.BeginInvoke((Action)(() =>
-                {
-                    if (s == null || !isDown) return;
-                    Point currentPos = this.PointFromScreen(new Point(raw_e.Position.X, raw_e.Position.Y));
-                    bool isShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-
-                    if (isShiftPressed)
-                    {
-                        if (drawingPolyline.Points.Count > 0)
-                        {
-                            Point startPos = drawingPolyline.Points[0];
-                            double dx = currentPos.X - startPos.X;
-                            double dy = currentPos.Y - startPos.Y;
-                            if (dx != 0 || dy != 0)
-                            {
-                                double angle = Math.Atan2(dy, dx);
-                                double angleDeg = angle * 180.0 / Math.PI;
-                                double roundedAngle = Math.Round(angleDeg / 45.0) * 45.0;
-                                double rad = roundedAngle * Math.PI / 180.0;
-                                double dist = Math.Sqrt(dx * dx + dy * dy);
-                                Point constrainedPos = new Point(startPos.X + dist * Math.Cos(rad), startPos.Y + dist * Math.Sin(rad));
-                                
-                                drawingPolyline.Points.Clear();
-                                drawingPolyline.Points.Add(startPos);
-                                drawingPolyline.Points.Add(constrainedPos);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (drawingPolyline.Points.Count == 0 || drawingPolyline.Points.Last() != currentPos)
-                        {
-                            drawingPolyline.Points.Add(currentPos);
-                        }
-                    }
-                }));
-            }
-            else if (!isDown && raw_e.Action == MouseAction.Down && nextClickDraws)
-            {
-                isDown = true;
-                raw_e.preventDefault = true;
-                nextClickDraws = false;
                 this.Show();
-                this.UpdateLayout();
-                drawingPolyline.Points.Clear();
-                Point startPos = this.PointFromScreen(new Point(raw_e.Position.X, raw_e.Position.Y));
-                drawingPolyline.Points.Add(startPos);
+                this.Activate();
             }
-            else if (isDown && raw_e.Action == MouseAction.Up)
+            else
             {
-                isDown = false;
-                nextClickHides = true;
+                Clear_Click(null, null);
+                this.Hide();
             }
         }
 
-        private void settingChanged(object sender, PropertyChangedEventArgs e)
+        #endregion
+
+        #region Settings & Window Setup
+
+        private void SettingChanged(object sender, PropertyChangedEventArgs e)
         {
             this.Dispatcher.BeginInvoke((Action)(() =>
             {
@@ -167,10 +140,13 @@ namespace KeyNStroke
                 switch (e.PropertyName)
                 {
                     case "AnnotateLineShortcutTrigger":
-                        nextClickDraws = true;
+                        ToggleDrawingMode();
                         break;
                     case "AnnotateLineColor":
-                        UpdateColor();
+                        if (ColorConverter.ConvertFromString(s.AnnotateLineColor.ToString()) is Color c)
+                        {
+                            currentColor = c;
+                        }
                         break;
                     case "AnnotateLineShortcut":
                         SetAnnotateLineShortcut(s.AnnotateLineShortcut);
@@ -179,36 +155,398 @@ namespace KeyNStroke
             }));
         }
 
-        void SetFormStyles()
+        private void SetFormStyles()
         {
-            Log.e("CI", $"WindowHandle={windowHandle}");
-            NativeMethodsGWL.ClickThrough(windowHandle);
             NativeMethodsGWL.HideFromAltTab(windowHandle);
-
-            this.Left = SystemParameters.VirtualScreenLeft;
-            this.Top = SystemParameters.VirtualScreenTop;
-            this.Width = SystemParameters.VirtualScreenWidth;
-            this.Height = SystemParameters.VirtualScreenHeight;
         }
 
-        void UpdateColor()
+        #endregion
+
+        #region Toolbar Events
+
+        private void Tool_Click(object sender, RoutedEventArgs e)
         {
-            drawingPolyline.Stroke = new SolidColorBrush(UIHelper.ToMediaColor(s.AnnotateLineColor));
+            if (sender is RadioButton rb && rb.Tag != null && Enum.TryParse(rb.Tag.ToString(), out ToolType tool))
+            {
+                currentTool = tool;
+            }
         }
+
+        private void Color_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag != null)
+            {
+                if (ColorConverter.ConvertFromString(btn.Tag.ToString()) is Color c)
+                {
+                    currentColor = c;
+                }
+            }
+        }
+
+        private void Thickness_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (comboThickness?.SelectedItem is ComboBoxItem item && item.Tag != null)
+            {
+                if (double.TryParse(item.Tag.ToString(), out double th))
+                {
+                    currentThickness = th;
+                }
+            }
+        }
+
+        private void Undo_Click(object sender, RoutedEventArgs e)
+        {
+            if (drawnElements.Count > 0)
+            {
+                var last = drawnElements[drawnElements.Count - 1];
+                drawingCanvas.Children.Remove(last);
+                drawnElements.RemoveAt(drawnElements.Count - 1);
+                if (last is Border b && b.Tag?.ToString() == "Badge")
+                {
+                    badgeCounter = Math.Max(1, badgeCounter - 1);
+                }
+            }
+        }
+
+        private void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            drawingCanvas.Children.Clear();
+            drawnElements.Clear();
+            badgeCounter = 1;
+        }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            if (isDrawingActive)
+            {
+                ToggleDrawingMode();
+            }
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Z && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                Undo_Click(null, null);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Escape)
+            {
+                Exit_Click(null, null);
+                e.Handled = true;
+            }
+        }
+
+        #endregion
+
+        #region Mouse Canvas Drawing
+
+        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!isDrawingActive) return;
+
+            Point mousePos = e.GetPosition(mainGrid);
+            Point toolbarPos = annotationToolbar.TranslatePoint(new Point(0, 0), mainGrid);
+            Rect toolbarRect = new Rect(toolbarPos, new Size(annotationToolbar.ActualWidth, annotationToolbar.ActualHeight));
+            if (toolbarRect.Contains(mousePos))
+            {
+                return;
+            }
+
+            startPoint = e.GetPosition(drawingCanvas);
+
+            if (currentTool == ToolType.Badge)
+            {
+                CreateBadge(startPoint);
+                return;
+            }
+
+            if (currentTool == ToolType.Text)
+            {
+                CreateTextBox(startPoint);
+                return;
+            }
+
+            isDragging = true;
+            InitPreviewElement(startPoint);
+        }
+
+        private void Grid_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!isDrawingActive || !isDragging || currentPreviewElement == null) return;
+
+            Point currPoint = e.GetPosition(drawingCanvas);
+            UpdatePreviewElement(startPoint, currPoint);
+        }
+
+        private void Grid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!isDrawingActive || !isDragging) return;
+
+            isDragging = false;
+            if (currentPreviewElement != null)
+            {
+                drawnElements.Add(currentPreviewElement);
+                currentPreviewElement = null;
+            }
+        }
+
+        #endregion
+
+        #region Shape Helpers
+
+        private void CreateBadge(Point p)
+        {
+            Border badge = new Border
+            {
+                Width = 28,
+                Height = 28,
+                CornerRadius = new CornerRadius(14),
+                Background = new SolidColorBrush(currentColor),
+                Effect = new DropShadowEffect { BlurRadius = 6, ShadowDepth = 2, Opacity = 0.4 },
+                Tag = "Badge"
+            };
+
+            TextBlock txt = new TextBlock
+            {
+                Text = badgeCounter.ToString(),
+                FontSize = 14,
+                FontWeight = FontWeights.Bold,
+                Foreground = Brushes.White,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            badge.Child = txt;
+
+            Canvas.SetLeft(badge, p.X - 14);
+            Canvas.SetTop(badge, p.Y - 14);
+
+            drawingCanvas.Children.Add(badge);
+            drawnElements.Add(badge);
+            badgeCounter++;
+        }
+
+        private void CreateTextBox(Point p)
+        {
+            TextBox tb = new TextBox
+            {
+                Background = new SolidColorBrush(Color.FromArgb(40, 0, 0, 0)),
+                Foreground = new SolidColorBrush(currentColor),
+                FontSize = 16,
+                FontWeight = FontWeights.Bold,
+                BorderBrush = new SolidColorBrush(currentColor),
+                BorderThickness = new Thickness(1),
+                Padding = new Thickness(4),
+                Text = "Text...",
+                MinWidth = 80
+            };
+
+            Canvas.SetLeft(tb, p.X);
+            Canvas.SetTop(tb, p.Y);
+
+            drawingCanvas.Children.Add(tb);
+            drawnElements.Add(tb);
+            tb.Focus();
+            tb.SelectAll();
+        }
+
+        private void InitPreviewElement(Point p)
+        {
+            switch (currentTool)
+            {
+                case ToolType.Pencil:
+                    Polyline poly = new Polyline
+                    {
+                        Stroke = new SolidColorBrush(currentColor),
+                        StrokeThickness = currentThickness,
+                        StrokeLineJoin = PenLineJoin.Round,
+                        StrokeStartLineCap = PenLineCap.Round,
+                        StrokeEndLineCap = PenLineCap.Round
+                    };
+                    poly.Points.Add(p);
+                    currentPreviewElement = poly;
+                    break;
+
+                case ToolType.Highlighter:
+                    Polyline hl = new Polyline
+                    {
+                        Stroke = new SolidColorBrush(currentColor),
+                        StrokeThickness = currentThickness * 3.5,
+                        Opacity = 0.45,
+                        StrokeLineJoin = PenLineJoin.Round,
+                        StrokeStartLineCap = PenLineCap.Round,
+                        StrokeEndLineCap = PenLineCap.Round
+                    };
+                    hl.Points.Add(p);
+                    currentPreviewElement = hl;
+                    break;
+
+                case ToolType.Arrow:
+                    Path arrowPath = new Path
+                    {
+                        Stroke = new SolidColorBrush(currentColor),
+                        StrokeThickness = currentThickness,
+                        Fill = new SolidColorBrush(currentColor),
+                        StrokeLineJoin = PenLineJoin.Round,
+                        StrokeStartLineCap = PenLineCap.Round,
+                        StrokeEndLineCap = PenLineCap.Round
+                    };
+                    currentPreviewElement = arrowPath;
+                    break;
+
+                case ToolType.Rectangle:
+                    Rectangle rect = new Rectangle
+                    {
+                        Stroke = new SolidColorBrush(currentColor),
+                        StrokeThickness = currentThickness,
+                        Fill = Brushes.Transparent
+                    };
+                    Canvas.SetLeft(rect, p.X);
+                    Canvas.SetTop(rect, p.Y);
+                    currentPreviewElement = rect;
+                    break;
+
+                case ToolType.Ellipse:
+                    Ellipse el = new Ellipse
+                    {
+                        Stroke = new SolidColorBrush(currentColor),
+                        StrokeThickness = currentThickness,
+                        Fill = Brushes.Transparent
+                    };
+                    Canvas.SetLeft(el, p.X);
+                    Canvas.SetTop(el, p.Y);
+                    currentPreviewElement = el;
+                    break;
+            }
+
+            if (currentPreviewElement != null)
+            {
+                drawingCanvas.Children.Add(currentPreviewElement);
+            }
+        }
+
+        private void UpdatePreviewElement(Point start, Point curr)
+        {
+            switch (currentTool)
+            {
+                case ToolType.Pencil:
+                    if (currentPreviewElement is Polyline poly)
+                    {
+                        bool isShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+                        if (isShiftPressed)
+                        {
+                            double dx = curr.X - start.X;
+                            double dy = curr.Y - start.Y;
+                            if (dx != 0 || dy != 0)
+                            {
+                                double angle = Math.Atan2(dy, dx);
+                                double angleDeg = angle * 180.0 / Math.PI;
+                                double roundedAngle = Math.Round(angleDeg / 45.0) * 45.0;
+                                double rad = roundedAngle * Math.PI / 180.0;
+                                double dist = Math.Sqrt(dx * dx + dy * dy);
+                                Point constrained = new Point(start.X + dist * Math.Cos(rad), start.Y + dist * Math.Sin(rad));
+
+                                poly.Points.Clear();
+                                poly.Points.Add(start);
+                                poly.Points.Add(constrained);
+                            }
+                        }
+                        else
+                        {
+                            if (poly.Points.Count == 0 || poly.Points.Last() != curr)
+                            {
+                                poly.Points.Add(curr);
+                            }
+                        }
+                    }
+                    break;
+
+                case ToolType.Highlighter:
+                    if (currentPreviewElement is Polyline hlPoly)
+                    {
+                        if (hlPoly.Points.Count == 0 || hlPoly.Points.Last() != curr)
+                        {
+                            hlPoly.Points.Add(curr);
+                        }
+                    }
+                    break;
+
+                case ToolType.Arrow:
+                    if (currentPreviewElement is Path arrowPath)
+                    {
+                        arrowPath.Data = CreateArrowGeometry(start, curr, currentThickness);
+                    }
+                    break;
+
+                case ToolType.Rectangle:
+                    if (currentPreviewElement is Rectangle rect)
+                    {
+                        double x = Math.Min(start.X, curr.X);
+                        double y = Math.Min(start.Y, curr.Y);
+                        double w = Math.Abs(start.X - curr.X);
+                        double h = Math.Abs(start.Y - curr.Y);
+
+                        Canvas.SetLeft(rect, x);
+                        Canvas.SetTop(rect, y);
+                        rect.Width = Math.Max(1, w);
+                        rect.Height = Math.Max(1, h);
+                    }
+                    break;
+
+                case ToolType.Ellipse:
+                    if (currentPreviewElement is Ellipse el)
+                    {
+                        double x = Math.Min(start.X, curr.X);
+                        double y = Math.Min(start.Y, curr.Y);
+                        double w = Math.Abs(start.X - curr.X);
+                        double h = Math.Abs(start.Y - curr.Y);
+
+                        Canvas.SetLeft(el, x);
+                        Canvas.SetTop(el, y);
+                        el.Width = Math.Max(1, w);
+                        el.Height = Math.Max(1, h);
+                    }
+                    break;
+            }
+        }
+
+        private Geometry CreateArrowGeometry(Point p1, Point p2, double thickness)
+        {
+            double dx = p2.X - p1.X;
+            double dy = p2.Y - p1.Y;
+            double angle = Math.Atan2(dy, dx);
+            double arrowLen = Math.Max(14, thickness * 3.5);
+
+            double angle1 = angle + Math.PI - (Math.PI / 6.0);
+            double angle2 = angle + Math.PI + (Math.PI / 6.0);
+
+            Point pArrow1 = new Point(p2.X + arrowLen * Math.Cos(angle1), p2.Y + arrowLen * Math.Sin(angle1));
+            Point pArrow2 = new Point(p2.X + arrowLen * Math.Cos(angle2), p2.Y + arrowLen * Math.Sin(angle2));
+
+            PathGeometry geom = new PathGeometry();
+            PathFigure figure = new PathFigure { StartPoint = p1, IsClosed = false };
+            figure.Segments.Add(new LineSegment(p2, true));
+
+            PathFigure headFigure = new PathFigure { StartPoint = p2, IsClosed = true, IsFilled = true };
+            headFigure.Segments.Add(new LineSegment(pArrow1, true));
+            headFigure.Segments.Add(new LineSegment(pArrow2, true));
+
+            geom.Figures.Add(figure);
+            geom.Figures.Add(headFigure);
+            return geom;
+        }
+
+        #endregion
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            if (m != null)
+            if (this.k != null)
             {
-                m.MouseEvent -= m_MouseEvent;
-            }
-            if (k != null)
-            {
-                k.KeystrokeEvent -= m_KeystrokeEvent;
+                this.k.KeystrokeEvent -= M_KeystrokeEvent;
             }
             if (s != null)
             {
-                s.PropertyChanged -= settingChanged;
+                s.PropertyChanged -= SettingChanged;
             }
             m = null;
             s = null;
