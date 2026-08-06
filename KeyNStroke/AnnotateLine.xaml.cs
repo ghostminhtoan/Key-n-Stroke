@@ -61,10 +61,6 @@ namespace KeyNStroke
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             SetAnnotateLineShortcut(s.AnnotateLineShortcut);
-            if (this.k != null)
-            {
-                this.k.KeystrokeEvent += M_KeystrokeEvent;
-            }
             windowHandle = new WindowInteropHelper(this).Handle;
             SetFormStyles();
             this.Hide();
@@ -73,29 +69,6 @@ namespace KeyNStroke
         #region Shortcut & Toggle
 
         public string AnnotateLineShortcut;
-
-        private void M_KeystrokeEvent(KeystrokeEventArgs e)
-        {
-            if (s == null) return;
-            string pressed = e.ShortcutIdentifier();
-            if (CheckForTrigger(pressed))
-            {
-                e.raw.preventDefault = true;
-            }
-        }
-
-        private bool CheckForTrigger(string pressed)
-        {
-            if (AnnotateLineShortcut != null && KeystrokeDisplay.ShortcutMatches(AnnotateLineShortcut, pressed))
-            {
-                this.Dispatcher.BeginInvoke((Action)(() =>
-                {
-                    ToggleDrawingMode();
-                }));
-                return true;
-            }
-            return false;
-        }
 
         public void SetAnnotateLineShortcut(string shortcut)
         {
@@ -543,10 +516,6 @@ namespace KeyNStroke
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            if (this.k != null)
-            {
-                this.k.KeystrokeEvent -= M_KeystrokeEvent;
-            }
             if (s != null)
             {
                 s.PropertyChanged -= SettingChanged;
