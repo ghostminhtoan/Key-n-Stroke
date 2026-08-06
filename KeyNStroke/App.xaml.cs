@@ -228,6 +228,10 @@ namespace KeyNStroke
             }
             if (AnnotateLineShortcut != null && KeystrokeDisplay.ShortcutMatches(AnnotateLineShortcut, pressed))
             {
+                if (!mySettings.EnableAnnotateLine)
+                {
+                    mySettings.EnableAnnotateLine = true;
+                }
                 if (AnnotateLineWindow == null)
                 {
                     EnableAnnotateLine();
@@ -488,6 +492,8 @@ namespace KeyNStroke
             Log.e("AL", "EnableAnnotateLineWindow");
             EnableMouseHook();
             AnnotateLineWindow = new AnnotateLine(myMouseHook, myKeystrokeConverter, mySettings);
+            AnnotateLineWindow.Show();
+            AnnotateLineWindow.Hide();
         }
 
 

@@ -64,7 +64,6 @@ namespace KeyNStroke
             SetAnnotateLineShortcut(s.AnnotateLineShortcut);
             windowHandle = new WindowInteropHelper(this).Handle;
             SetFormStyles();
-            UpdateColorSelectionUI();
         }
 
         #region Shortcut & Toggle
@@ -144,24 +143,13 @@ namespace KeyNStroke
             }
         }
 
-        private void UpdateColorSelectionUI()
-        {
-            if (btnCustomColor != null)
-            {
-                btnCustomColor.Background = new SolidColorBrush(currentColor);
-                double brightness = (currentColor.R * 0.299 + currentColor.G * 0.587 + currentColor.B * 0.114) / 255.0;
-                btnCustomColor.Foreground = brightness > 0.5 ? Brushes.Black : Brushes.White;
-            }
-        }
-
         private void Color_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag != null)
             {
                 if (ColorConverter.ConvertFromString(btn.Tag.ToString()) is Color c)
                 {
-                    currentColor = c;
-                    UpdateColorSelectionUI();
+                    UpdateColorSelectionUI(c);
                 }
             }
         }
@@ -174,9 +162,20 @@ namespace KeyNStroke
                 dlg.FullOpen = true;
                 if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    currentColor = Color.FromArgb(dlg.Color.A, dlg.Color.R, dlg.Color.G, dlg.Color.B);
-                    UpdateColorSelectionUI();
+                    Color c = Color.FromArgb(dlg.Color.A, dlg.Color.R, dlg.Color.G, dlg.Color.B);
+                    UpdateColorSelectionUI(c);
                 }
+            }
+        }
+
+        private void UpdateColorSelectionUI(Color c)
+        {
+            currentColor = c;
+            if (btnCustomColor != null)
+            {
+                btnCustomColor.Background = new SolidColorBrush(c);
+                double luminance = (0.299 * c.R + 0.587 * c.G + 0.114 * c.B) / 255;
+                btnCustomColor.Foreground = luminance < 0.5 ? Brushes.White : Brushes.Black;
             }
         }
 
@@ -239,7 +238,23 @@ namespace KeyNStroke
                 RenderTargetBitmap rtb = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
                 rtb.Render(drawingCanvas);
 
-                Clipboard.SetImage(rtb);
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(rtb));
+                using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+                {
+                    encoder.Save(ms);
+                    ms.Position = 0;
+                    BitmapImage bitmapImage = new BitmapImage();
+                    bitmapImage.BeginInit();
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.StreamSource = ms;
+                    bitmapImage.EndInit();
+
+                    DataObject dataObj = new DataObject();
+                    dataObj.SetData(DataFormats.Bitmap, bitmapImage, true);
+                    dataObj.SetData("PNG", ms, true);
+                    Clipboard.SetDataObject(dataObj, true);
+                }
             }
             catch (Exception ex)
             {
