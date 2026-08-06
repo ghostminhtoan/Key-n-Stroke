@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -190,6 +190,10 @@ namespace KeyNStroke
         {
             string pressed = e.ShortcutIdentifier();
             e.raw.preventDefault = e.raw.preventDefault || CheckForTrigger(pressed);
+            if (KeystrokeHistoryWindow != null)
+            {
+                // KeystrokeDisplay uses setting triggers, but we can also handle preventDefault here or let it bubble.
+            }
         }
 
         private bool CheckForTrigger(string pressed)

@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -554,7 +554,7 @@ namespace KeyNStroke
             set { i.enableKeystrokeHistory = value; OnSettingChanged("EnableKeystrokeHistory"); }
         }
 
-        public String KeystrokeHistorySettingsModeShortcutDefault = "RightCtrl + F12";
+        public String KeystrokeHistorySettingsModeShortcutDefault = "Alt + F12";
         public String KeystrokeHistorySettingsModeShortcut
         {
             get { return Or(i.keystrokeHistorySettingsModeShortcut, KeystrokeHistorySettingsModeShortcutDefault); }
@@ -568,7 +568,7 @@ namespace KeyNStroke
             set { i.enableSettingsMode = value; OnSettingChanged("EnableSettingsMode"); }
         }
 
-        public String KeystrokeHistoryPasswordModeShortcutDefault = "RightCtrl + F11";
+        public String KeystrokeHistoryPasswordModeShortcutDefault = "Alt + F11";
         public String KeystrokeHistoryPasswordModeShortcut
         {
             get { return Or(i.keystrokeHistoryPasswordModeShortcut, KeystrokeHistoryPasswordModeShortcutDefault); }

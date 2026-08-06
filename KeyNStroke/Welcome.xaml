@@ -1,4 +1,4 @@
-﻿<Window x:Class="KeyNStroke.Welcome"
+<Window x:Class="KeyNStroke.Welcome"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -38,9 +38,9 @@
                 <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding StandbyShortcut, Mode=OneWay}" /></Span><Run Text=" to toggle standby mode." />
             </TextBlock>
             <TextBlock Visibility="{Binding EnableKeystrokeHistory, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding KeystrokeHistorySettingsModeShortcut, Mode=OneWay}" /></Span><Run Text=" to move the keystroke history window." />
+                <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding KeystrokeHistorySettingsModeShortcut, Mode=OneWay}" /></Span><Run Text=" to show/hide UI (Settings Mode)." />
                 <LineBreak />
-                <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding KeystrokeHistoryPasswordModeShortcut, Mode=OneWay}" /></Span><Run Text=" to toggle password mode." />
+                <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding KeystrokeHistoryPasswordModeShortcut, Mode=OneWay}" /></Span><Run Text=" to toggle show/hide Keystroke History." />
             </TextBlock>
             <TextBlock Visibility="{Binding EnableAnnotateLine, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding AnnotateLineShortcut, Mode=OneWay}" /></Span><Run Text=" to draw a line." />
