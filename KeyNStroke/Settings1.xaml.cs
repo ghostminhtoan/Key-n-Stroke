@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -77,6 +77,8 @@ namespace KeyNStroke
             PasswordModeShortcutDefault.Text = settings.KeystrokeHistoryPasswordModeShortcutDefault;
             AnnotateLineShortcutDefault.Text = settings.AnnotateLineShortcutDefault;
             StandbyShortcutDefault.Text = settings.StandbyShortcutDefault;
+            ToggleKeystrokeHistoryShortcutDefault.Text = settings.ToggleKeystrokeHistoryShortcutDefault;
+            ToggleUiShortcutDefault.Text = settings.ToggleUiShortcutDefault;
             s.PropertyChanged += S_PropertyChanged;
             s.CallPropertyChangedForAllProperties();
         }
@@ -245,6 +247,54 @@ namespace KeyNStroke
         private void Hyperlink_TriggerStandbyShortcut(object sender, RoutedEventArgs e)
         {
             settings.Standby = !settings.Standby;
+        }
+
+        #endregion
+
+        #region Shortcut - Toggle Keystroke History
+
+        private void Hyperlink_ChangeToggleKeystrokeHistoryShortcut(object sender, RoutedEventArgs e)
+        {
+            ReadShortcut rs = new ReadShortcut(k, " toggling keystroke history.");
+            rs.ShowDialog();
+            if (rs.Shortcut != null)
+            {
+                settings.ToggleKeystrokeHistoryShortcut = rs.Shortcut;
+            }
+        }
+
+        private void Hyperlink_ResetToggleKeystrokeHistoryShortcut(object sender, RoutedEventArgs e)
+        {
+            settings.ToggleKeystrokeHistoryShortcut = settings.ToggleKeystrokeHistoryShortcutDefault;
+        }
+
+        private void Hyperlink_TriggerToggleKeystrokeHistoryShortcut(object sender, RoutedEventArgs e)
+        {
+            settings.EnableKeystrokeHistory = !settings.EnableKeystrokeHistory;
+        }
+
+        #endregion
+
+        #region Shortcut - Toggle UI
+
+        private void Hyperlink_ChangeToggleUiShortcut(object sender, RoutedEventArgs e)
+        {
+            ReadShortcut rs = new ReadShortcut(k, " toggling settings mode UI.");
+            rs.ShowDialog();
+            if (rs.Shortcut != null)
+            {
+                settings.ToggleUiShortcut = rs.Shortcut;
+            }
+        }
+
+        private void Hyperlink_ResetToggleUiShortcut(object sender, RoutedEventArgs e)
+        {
+            settings.ToggleUiShortcut = settings.ToggleUiShortcutDefault;
+        }
+
+        private void Hyperlink_TriggerToggleUiShortcut(object sender, RoutedEventArgs e)
+        {
+            settings.EnableSettingsMode = !settings.EnableSettingsMode;
         }
 
         #endregion

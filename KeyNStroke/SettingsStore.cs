@@ -234,6 +234,8 @@ namespace KeyNStroke
         [DataMember] public String standbyShortcut = null;
         [DataMember] public Nullable<bool> startInStandby = null;
         [DataMember] public Nullable<bool> welcomeOnStartup = null;
+        [DataMember] public String toggleKeystrokeHistoryShortcut = null;
+        [DataMember] public String toggleUiShortcut = null;
 
 
     }
@@ -658,6 +660,20 @@ namespace KeyNStroke
             set { i.welcomeOnStartup = value; OnSettingChanged("WelcomeOnStartup"); }
         }
 
+        public String ToggleKeystrokeHistoryShortcutDefault = "Ctrl + F8";
+        public String ToggleKeystrokeHistoryShortcut
+        {
+            get { return Or(i.toggleKeystrokeHistoryShortcut, ToggleKeystrokeHistoryShortcutDefault); }
+            set { i.toggleKeystrokeHistoryShortcut = value; OnSettingChanged("ToggleKeystrokeHistoryShortcut"); }
+        }
+
+        public String ToggleUiShortcutDefault = "Ctrl + F7";
+        public String ToggleUiShortcut
+        {
+            get { return Or(i.toggleUiShortcut, ToggleUiShortcutDefault); }
+            set { i.toggleUiShortcut = value; OnSettingChanged("ToggleUiShortcut"); }
+        }
+
         // Add new settings also to method CallPropertyChangedForAllProperties()
 
         #endregion
@@ -726,6 +742,8 @@ namespace KeyNStroke
                 PropertyChanged(this, new PropertyChangedEventArgs("StartInStandby"));
                 PropertyChanged(this, new PropertyChangedEventArgs("Standby"));
                 PropertyChanged(this, new PropertyChangedEventArgs("WelcomeOnStartup"));
+                PropertyChanged(this, new PropertyChangedEventArgs("ToggleKeystrokeHistoryShortcut"));
+                PropertyChanged(this, new PropertyChangedEventArgs("ToggleUiShortcut"));
 
             }
         }
@@ -859,6 +877,8 @@ StandbyShortcut:                {StandbyShortcut}
 StartInStandby:                 {StartInStandby}
 Standby:                        {Standby}
 WelcomeOnStartup:               {WelcomeOnStartup}
+ToggleKeystrokeHistoryShortcut: {ToggleKeystrokeHistoryShortcut}
+ToggleUiShortcut:               {ToggleUiShortcut}
 ";
         }
 

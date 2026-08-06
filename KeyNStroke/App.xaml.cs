@@ -185,6 +185,8 @@ namespace KeyNStroke
         #region Shortcut
 
         public string StandbyShortcut;
+        public string ToggleKeystrokeHistoryShortcut;
+        public string ToggleUiShortcut;
 
         void m_KeystrokeEvent(KeystrokeEventArgs e)
         {
@@ -203,6 +205,16 @@ namespace KeyNStroke
                 mySettings.Standby = !mySettings.Standby;
                 return true;
             }
+            if (ToggleKeystrokeHistoryShortcut != null && pressed == ToggleKeystrokeHistoryShortcut)
+            {
+                mySettings.EnableKeystrokeHistory = !mySettings.EnableKeystrokeHistory;
+                return true;
+            }
+            if (ToggleUiShortcut != null && pressed == ToggleUiShortcut)
+            {
+                mySettings.EnableSettingsMode = !mySettings.EnableSettingsMode;
+                return true;
+            }
             return false;
         }
 
@@ -215,6 +227,30 @@ namespace KeyNStroke
             else
             {
                 StandbyShortcut = mySettings.StandbyShortcutDefault;
+            }
+        }
+
+        public void SetToggleKeystrokeHistoryShortcut(string shortcut)
+        {
+            if (KeystrokeDisplay.ValidateShortcutSetting(shortcut))
+            {
+                ToggleKeystrokeHistoryShortcut = shortcut;
+            }
+            else
+            {
+                ToggleKeystrokeHistoryShortcut = mySettings.ToggleKeystrokeHistoryShortcutDefault;
+            }
+        }
+
+        public void SetToggleUiShortcut(string shortcut)
+        {
+            if (KeystrokeDisplay.ValidateShortcutSetting(shortcut))
+            {
+                ToggleUiShortcut = shortcut;
+            }
+            else
+            {
+                ToggleUiShortcut = mySettings.ToggleUiShortcutDefault;
             }
         }
 
@@ -250,6 +286,12 @@ namespace KeyNStroke
                     break;
                 case "StandbyShortcut":
                     SetStandbyShortcut(mySettings.StandbyShortcut);
+                    break;
+                case "ToggleKeystrokeHistoryShortcut":
+                    SetToggleKeystrokeHistoryShortcut(mySettings.ToggleKeystrokeHistoryShortcut);
+                    break;
+                case "ToggleUiShortcut":
+                    SetToggleUiShortcut(mySettings.ToggleUiShortcut);
                     break;
                 case "Standby":
                     OnCursorIndicatorSettingChanged();

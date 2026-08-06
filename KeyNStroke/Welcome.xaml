@@ -45,6 +45,11 @@
             <TextBlock Visibility="{Binding EnableAnnotateLine, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding AnnotateLineShortcut, Mode=OneWay}" /></Span><Run Text=" to draw a line." />
             </TextBlock>
+            <TextBlock>
+                <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding ToggleKeystrokeHistoryShortcut, Mode=OneWay}" /></Span><Run Text=" to toggle keystroke history visibility." />
+                <LineBreak />
+                <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding ToggleUiShortcut, Mode=OneWay}" /></Span><Run Text=" to toggle Settings Mode UI visibility." />
+            </TextBlock>
         </StackPanel>
         <Button x:Name="ButtonCheckForUpdates"
                 Content="Check for Updates"

@@ -425,6 +425,28 @@
                                 <Hyperlink Click="Hyperlink_TriggerStandbyShortcut">Trigger</Hyperlink>
                                 <LineBreak />
                                 <Hyperlink Click="Hyperlink_ResetStandbyShortcut">Reset to <Run x:Name="StandbyShortcutDefault"></Run></Hyperlink></TextBlock>
+                                <TextBlock TextWrapping="Wrap"
+                                           Margin="5,10,0,0">
+                                Toggle Keystroke History</TextBlock>
+                                <TextBlock TextWrapping="Wrap"
+                                           Margin="15,3,0,0">
+                                <Run Text="{Binding ToggleKeystrokeHistoryShortcut}" />
+                                <LineBreak />
+                                <Hyperlink Click="Hyperlink_ChangeToggleKeystrokeHistoryShortcut">Change</Hyperlink>&#160;&#160;&#160;&#160;&#160;&#160;
+                                <Hyperlink Click="Hyperlink_TriggerToggleKeystrokeHistoryShortcut">Trigger</Hyperlink>
+                                <LineBreak />
+                                <Hyperlink Click="Hyperlink_ResetToggleKeystrokeHistoryShortcut">Reset to <Run x:Name="ToggleKeystrokeHistoryShortcutDefault"></Run></Hyperlink></TextBlock>
+                                <TextBlock TextWrapping="Wrap"
+                                           Margin="5,10,0,0">
+                                Toggle UI (Settings mode)</TextBlock>
+                                <TextBlock TextWrapping="Wrap"
+                                           Margin="15,3,0,0">
+                                <Run Text="{Binding ToggleUiShortcut}" />
+                                <LineBreak />
+                                <Hyperlink Click="Hyperlink_ChangeToggleUiShortcut">Change</Hyperlink>&#160;&#160;&#160;&#160;&#160;&#160;
+                                <Hyperlink Click="Hyperlink_TriggerToggleUiShortcut">Trigger</Hyperlink>
+                                <LineBreak />
+                                <Hyperlink Click="Hyperlink_ResetToggleUiShortcut">Reset to <Run x:Name="ToggleUiShortcutDefault"></Run></Hyperlink></TextBlock>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
