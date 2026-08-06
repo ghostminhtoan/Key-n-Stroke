@@ -144,10 +144,7 @@ namespace KeyNStroke
                         ToggleDrawingMode();
                         break;
                     case "AnnotateLineColor":
-                        if (ColorConverter.ConvertFromString(s.AnnotateLineColor.ToString()) is Color c)
-                        {
-                            currentColor = c;
-                        }
+                        currentColor = UIHelper.ToMediaColor(s.AnnotateLineColor);
                         break;
                     case "AnnotateLineShortcut":
                         SetAnnotateLineShortcut(s.AnnotateLineShortcut);
