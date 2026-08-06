@@ -88,6 +88,10 @@ namespace KeyNStroke
 
         #endregion
 
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern short GetKeyState(int vKey);
+        private const int VK_SHIFT = 0x10;
+
         private void m_MouseEvent(MouseRawEventArgs raw_e)
         {
             if (s == null) return;
@@ -100,16 +104,54 @@ namespace KeyNStroke
 
             if (isDown && raw_e.Action == MouseAction.Move)
             {
-                endCursorPosition = raw_e.Position;
-                UpdatePositionAndSize();
+                raw_e.preventDefault = true;
+                this.Dispatcher.BeginInvoke((Action)(() =>
+                {
+                    if (s == null || !isDown) return;
+                    Point currentPos = this.PointFromScreen(new Point(raw_e.Position.X, raw_e.Position.Y));
+                    bool isShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+
+                    if (isShiftPressed)
+                    {
+                        if (drawingPolyline.Points.Count > 0)
+                        {
+                            Point startPos = drawingPolyline.Points[0];
+                            double dx = currentPos.X - startPos.X;
+                            double dy = currentPos.Y - startPos.Y;
+                            if (dx != 0 || dy != 0)
+                            {
+                                double angle = Math.Atan2(dy, dx);
+                                double angleDeg = angle * 180.0 / Math.PI;
+                                double roundedAngle = Math.Round(angleDeg / 45.0) * 45.0;
+                                double rad = roundedAngle * Math.PI / 180.0;
+                                double dist = Math.Sqrt(dx * dx + dy * dy);
+                                Point constrainedPos = new Point(startPos.X + dist * Math.Cos(rad), startPos.Y + dist * Math.Sin(rad));
+                                
+                                drawingPolyline.Points.Clear();
+                                drawingPolyline.Points.Add(startPos);
+                                drawingPolyline.Points.Add(constrainedPos);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (drawingPolyline.Points.Count == 0 || drawingPolyline.Points.Last() != currentPos)
+                        {
+                            drawingPolyline.Points.Add(currentPos);
+                        }
+                    }
+                }));
             }
             else if (!isDown && raw_e.Action == MouseAction.Down && nextClickDraws)
             {
                 isDown = true;
                 raw_e.preventDefault = true;
                 nextClickDraws = false;
-                startCursorPosition = raw_e.Position;
-                endCursorPosition = raw_e.Position;
+                this.Show();
+                this.UpdateLayout();
+                drawingPolyline.Points.Clear();
+                Point startPos = this.PointFromScreen(new Point(raw_e.Position.X, raw_e.Position.Y));
+                drawingPolyline.Points.Add(startPos);
             }
             else if (isDown && raw_e.Action == MouseAction.Up)
             {
@@ -144,50 +186,15 @@ namespace KeyNStroke
             NativeMethodsGWL.ClickThrough(windowHandle);
             NativeMethodsGWL.HideFromAltTab(windowHandle);
 
-            UpdatePositionAndSize();
+            this.Left = SystemParameters.VirtualScreenLeft;
+            this.Top = SystemParameters.VirtualScreenTop;
+            this.Width = SystemParameters.VirtualScreenWidth;
+            this.Height = SystemParameters.VirtualScreenHeight;
         }
 
         void UpdateColor()
         {
-            line.Fill = new SolidColorBrush(UIHelper.ToMediaColor(s.AnnotateLineColor));
-        }
-
-        void UpdatePositionAndSize()
-        {
-            if (isDown)
-            {
-                this.Show();
-                Int32 xmin = Math.Min(startCursorPosition.X, endCursorPosition.X);
-                Int32 ymin = Math.Min(startCursorPosition.Y, endCursorPosition.Y);
-                Int32 h = Math.Abs(startCursorPosition.Y - endCursorPosition.Y);
-                Int32 w = Math.Abs(startCursorPosition.X - endCursorPosition.X);
-                bool horizontal = w >= h;
-
-                IntPtr monitor = NativeMethodsWindow.MonitorFromPoint(startCursorPosition, NativeMethodsWindow.MonitorOptions.MONITOR_DEFAULTTONEAREST);
-                uint adpiX = 0, adpiY = 0;
-                NativeMethodsWindow.GetDpiForMonitor(monitor, NativeMethodsWindow.DpiType.MDT_EFFECTIVE_DPI, ref adpiX, ref adpiY);
-                Log.e("AL", $"apix={adpiX} adpiy={adpiY} aw={ActualWidth} ah={ActualHeight} cx={startCursorPosition.X} cy={startCursorPosition.Y}");
-
-
-                if (horizontal)
-                {
-                    this.Width = w / (double)adpiX * 96.0;
-                    this.Height = 4;
-                    NativeMethodsWindow.SetWindowPosition(windowHandle, (int)xmin, (int)startCursorPosition.Y - 2);
-                }
-                else
-                {
-                    this.Width = 4;
-                    this.Height = h / (double)adpiY * 96.0;
-                    NativeMethodsWindow.SetWindowPosition(windowHandle, (int)startCursorPosition.X - 2, ymin);
-                }
-
-            }
-            else
-            {
-                this.Hide();
-            }
-            
+            drawingPolyline.Stroke = new SolidColorBrush(UIHelper.ToMediaColor(s.AnnotateLineColor));
         }
 
         private void Window_Closed(object sender, EventArgs e)
