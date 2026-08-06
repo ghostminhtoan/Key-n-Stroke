@@ -60,13 +60,14 @@ namespace KeyNStroke
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            s.CallPropertyChangedForAllProperties();
+            SetAnnotateLineShortcut(s.AnnotateLineShortcut);
             if (this.k != null)
             {
                 this.k.KeystrokeEvent += M_KeystrokeEvent;
             }
             windowHandle = new WindowInteropHelper(this).Handle;
             SetFormStyles();
+            this.Hide();
         }
 
         #region Shortcut & Toggle

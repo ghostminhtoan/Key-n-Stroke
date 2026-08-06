@@ -460,7 +460,6 @@ namespace KeyNStroke
             Log.e("AL", "EnableAnnotateLineWindow");
             EnableMouseHook();
             AnnotateLineWindow = new AnnotateLine(myMouseHook, myKeystrokeConverter, mySettings);
-            AnnotateLineWindow.Show();
         }
 
 
