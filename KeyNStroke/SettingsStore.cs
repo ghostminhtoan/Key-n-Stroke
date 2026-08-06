@@ -556,7 +556,7 @@ namespace KeyNStroke
             set { i.enableKeystrokeHistory = value; OnSettingChanged("EnableKeystrokeHistory"); }
         }
 
-        public String KeystrokeHistorySettingsModeShortcutDefault = "Ctrl + Alt + F12";
+        public String KeystrokeHistorySettingsModeShortcutDefault = "Ctrl + Shift + F12";
         public String KeystrokeHistorySettingsModeShortcut
         {
             get { return Or(i.keystrokeHistorySettingsModeShortcut, KeystrokeHistorySettingsModeShortcutDefault); }
@@ -570,7 +570,7 @@ namespace KeyNStroke
             set { i.enableSettingsMode = value; OnSettingChanged("EnableSettingsMode"); }
         }
 
-        public String KeystrokeHistoryPasswordModeShortcutDefault = "Ctrl + Alt + F11";
+        public String KeystrokeHistoryPasswordModeShortcutDefault = "Ctrl + Shift + F11";
         public String KeystrokeHistoryPasswordModeShortcut
         {
             get { return Or(i.keystrokeHistoryPasswordModeShortcut, KeystrokeHistoryPasswordModeShortcutDefault); }
