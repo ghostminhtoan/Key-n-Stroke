@@ -38,9 +38,9 @@
                 <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding StandbyShortcut, Mode=OneWay}" /></Span><Run Text=" to toggle standby mode." />
             </TextBlock>
             <TextBlock Visibility="{Binding EnableKeystrokeHistory, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding KeystrokeHistorySettingsModeShortcut, Mode=OneWay}" /></Span><Run Text=" to show/hide UI (Settings Mode)." />
+                <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding KeystrokeHistorySettingsModeShortcut, Mode=OneWay}" /></Span><Run Text=" to move the keystroke history window." />
                 <LineBreak />
-                <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding KeystrokeHistoryPasswordModeShortcut, Mode=OneWay}" /></Span><Run Text=" to toggle show/hide Keystroke History." />
+                <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding KeystrokeHistoryPasswordModeShortcut, Mode=OneWay}" /></Span><Run Text=" to toggle password mode." />
             </TextBlock>
             <TextBlock Visibility="{Binding EnableAnnotateLine, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Run Text="Press " /><Span FontWeight="Bold"><Run Text="{Binding AnnotateLineShortcut, Mode=OneWay}" /></Span><Run Text=" to draw a line." />
