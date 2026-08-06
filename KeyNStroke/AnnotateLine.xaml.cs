@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -66,7 +66,7 @@ namespace KeyNStroke
 
         private bool CheckForTrigger(string pressed)
         {
-            if (AnnotateLineShortcut != null && pressed == AnnotateLineShortcut)
+            if (AnnotateLineShortcut != null && KeystrokeDisplay.ShortcutMatches(AnnotateLineShortcut, pressed))
             {
                 nextClickDraws = true;
                 return true;

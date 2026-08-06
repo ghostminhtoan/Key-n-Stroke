@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -386,9 +386,63 @@ namespace KeyNStroke
             return true;
         }
 
+        public static bool ShortcutMatches(string setting, string pressed)
+        {
+            if (setting == null || pressed == null)
+                return false;
+
+            string[] settingKeys = setting.Split(new[] { '+' }, StringSplitOptions.RemoveEmptyEntries)
+                                          .Select(k => k.Trim()).ToArray();
+            string[] pressedKeys = pressed.Split(new[] { '+' }, StringSplitOptions.RemoveEmptyEntries)
+                                          .Select(k => k.Trim()).ToArray();
+
+            if (settingKeys.Length != pressedKeys.Length)
+                return false;
+
+            foreach (string skey in settingKeys)
+            {
+                bool matched = false;
+                foreach (string pkey in pressedKeys)
+                {
+                    if (skey.Equals(pkey, StringComparison.OrdinalIgnoreCase))
+                    {
+                        matched = true;
+                        break;
+                    }
+                    if (skey.Equals("Ctrl", StringComparison.OrdinalIgnoreCase) && 
+                        (pkey.Equals("LeftCtrl", StringComparison.OrdinalIgnoreCase) || pkey.Equals("RightCtrl", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        matched = true;
+                        break;
+                    }
+                    if (skey.Equals("Alt", StringComparison.OrdinalIgnoreCase) && 
+                        (pkey.Equals("LeftAlt", StringComparison.OrdinalIgnoreCase) || pkey.Equals("RightAlt", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        matched = true;
+                        break;
+                    }
+                    if (skey.Equals("Shift", StringComparison.OrdinalIgnoreCase) && 
+                        (pkey.Equals("LeftShift", StringComparison.OrdinalIgnoreCase) || pkey.Equals("RightShift", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        matched = true;
+                        break;
+                    }
+                    if (skey.Equals("Win", StringComparison.OrdinalIgnoreCase) && 
+                        (pkey.Equals("LeftWin", StringComparison.OrdinalIgnoreCase) || pkey.Equals("RightWin", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched)
+                    return false;
+            }
+            return true;
+        }
+
         private bool CheckForSettingsMode(string pressed)
         {
-            if (SettingsModeShortcut != null && pressed == SettingsModeShortcut)
+            if (SettingsModeShortcut != null && ShortcutMatches(SettingsModeShortcut, pressed))
             {
                 settings.EnableSettingsMode = !settings.EnableSettingsMode;
                 return true;
@@ -477,7 +531,7 @@ namespace KeyNStroke
 
         private bool CheckForPasswordMode(string pressed)
         {
-            if (PasswordModeShortcut != null && pressed == PasswordModeShortcut)
+            if (PasswordModeShortcut != null && ShortcutMatches(PasswordModeShortcut, pressed))
             {
                 settings.EnablePasswordMode = !settings.EnablePasswordMode;
                 return true;

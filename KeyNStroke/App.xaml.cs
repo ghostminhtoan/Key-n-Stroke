@@ -200,17 +200,17 @@ namespace KeyNStroke
 
         private bool CheckForTrigger(string pressed)
         {
-            if (StandbyShortcut != null && pressed == StandbyShortcut)
+            if (StandbyShortcut != null && KeystrokeDisplay.ShortcutMatches(StandbyShortcut, pressed))
             {
                 mySettings.Standby = !mySettings.Standby;
                 return true;
             }
-            if (ToggleKeystrokeHistoryShortcut != null && pressed == ToggleKeystrokeHistoryShortcut)
+            if (ToggleKeystrokeHistoryShortcut != null && KeystrokeDisplay.ShortcutMatches(ToggleKeystrokeHistoryShortcut, pressed))
             {
                 mySettings.EnableKeystrokeHistory = !mySettings.EnableKeystrokeHistory;
                 return true;
             }
-            if (ToggleUiShortcut != null && pressed == ToggleUiShortcut)
+            if (ToggleUiShortcut != null && KeystrokeDisplay.ShortcutMatches(ToggleUiShortcut, pressed))
             {
                 mySettings.EnableSettingsMode = !mySettings.EnableSettingsMode;
                 return true;
