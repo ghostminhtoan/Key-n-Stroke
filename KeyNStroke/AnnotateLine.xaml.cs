@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace KeyNStroke
@@ -194,6 +195,78 @@ namespace KeyNStroke
             }
         }
 
+        private void CopyScreenshot_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                annotationToolbar.Visibility = Visibility.Collapsed;
+                this.UpdateLayout();
+
+                int width = (int)drawingCanvas.ActualWidth;
+                int height = (int)drawingCanvas.ActualHeight;
+
+                if (width <= 0 || height <= 0)
+                {
+                    width = (int)SystemParameters.VirtualScreenWidth;
+                    height = (int)SystemParameters.VirtualScreenHeight;
+                }
+
+                RenderTargetBitmap rtb = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+                rtb.Render(drawingCanvas);
+
+                Clipboard.SetImage(rtb);
+            }
+            catch (Exception ex)
+            {
+                Log.e("AL", "CopyScreenshot failed: " + ex.Message);
+            }
+            finally
+            {
+                annotationToolbar.Visibility = Visibility.Visible;
+            }
+        }
+
+        private bool isToolbarDragging = false;
+        private Point toolbarDragStartPos;
+
+        private void DragGrip_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            isToolbarDragging = true;
+            toolbarDragStartPos = e.GetPosition(mainGrid);
+            dragGrip.CaptureMouse();
+            e.Handled = true;
+        }
+
+        private void DragGrip_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isToolbarDragging)
+            {
+                Point currentPos = e.GetPosition(mainGrid);
+                double deltaX = currentPos.X - toolbarDragStartPos.X;
+                double deltaY = currentPos.Y - toolbarDragStartPos.Y;
+
+                Thickness margin = annotationToolbar.Margin;
+                annotationToolbar.HorizontalAlignment = HorizontalAlignment.Left;
+                annotationToolbar.VerticalAlignment = VerticalAlignment.Top;
+
+                double currentLeft = (annotationToolbar.ActualWidth > 0 && margin.Left == 0) ? (mainGrid.ActualWidth - annotationToolbar.ActualWidth) / 2 : margin.Left;
+                double currentTop = margin.Top;
+
+                annotationToolbar.Margin = new Thickness(Math.Max(0, currentLeft + deltaX), Math.Max(0, currentTop + deltaY), 0, 0);
+                toolbarDragStartPos = currentPos;
+            }
+        }
+
+        private void DragGrip_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (isToolbarDragging)
+            {
+                isToolbarDragging = false;
+                try { dragGrip.ReleaseMouseCapture(); } catch { }
+                e.Handled = true;
+            }
+        }
+
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Z && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
@@ -205,6 +278,41 @@ namespace KeyNStroke
             {
                 Exit_Click(null, null);
                 e.Handled = true;
+            }
+            else if (e.Key == Key.P)
+            {
+                btnToolPencil.IsChecked = true;
+                currentTool = ToolType.Pencil;
+            }
+            else if (e.Key == Key.A)
+            {
+                btnToolArrow.IsChecked = true;
+                currentTool = ToolType.Arrow;
+            }
+            else if (e.Key == Key.R)
+            {
+                btnToolRect.IsChecked = true;
+                currentTool = ToolType.Rectangle;
+            }
+            else if (e.Key == Key.E || e.Key == Key.C)
+            {
+                btnToolEllipse.IsChecked = true;
+                currentTool = ToolType.Ellipse;
+            }
+            else if (e.Key == Key.H)
+            {
+                btnToolHighlighter.IsChecked = true;
+                currentTool = ToolType.Highlighter;
+            }
+            else if (e.Key == Key.B)
+            {
+                btnToolBadge.IsChecked = true;
+                currentTool = ToolType.Badge;
+            }
+            else if (e.Key == Key.T)
+            {
+                btnToolText.IsChecked = true;
+                currentTool = ToolType.Text;
             }
         }
 

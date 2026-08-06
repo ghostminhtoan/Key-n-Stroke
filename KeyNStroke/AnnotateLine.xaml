@@ -103,14 +103,19 @@
                 <DropShadowEffect BlurRadius="12" ShadowDepth="3" Opacity="0.5" Color="Black"/>
             </Border.Effect>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- Drag Grip -->
+                <Border x:Name="dragGrip" Cursor="SizeAll" Margin="2,0,6,0" VerticalAlignment="Center" MouseLeftButtonDown="DragGrip_MouseDown" MouseMove="DragGrip_MouseMove" MouseLeftButtonUp="DragGrip_MouseUp" ToolTip="Drag to move toolbar">
+                    <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+                </Border>
+
                 <!-- Tool Selection Buttons -->
-                <RadioButton x:Name="btnToolPencil" Content="✏️" ToolTip="Pencil (Hold Shift for straight lines)" Style="{StaticResource ToolbarToolBtn}" IsChecked="True" Click="Tool_Click" Tag="Pencil"/>
-                <RadioButton x:Name="btnToolArrow" Content="↗️" ToolTip="Arrow" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Arrow"/>
-                <RadioButton x:Name="btnToolRect" Content="▭" ToolTip="Rectangle" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Rectangle"/>
-                <RadioButton x:Name="btnToolEllipse" Content="◯" ToolTip="Ellipse / Circle" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Ellipse"/>
-                <RadioButton x:Name="btnToolHighlighter" Content="🖊️" ToolTip="Highlighter" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Highlighter"/>
-                <RadioButton x:Name="btnToolBadge" Content="①" ToolTip="Step Counter Badge" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Badge"/>
-                <RadioButton x:Name="btnToolText" Content="🔤" ToolTip="Text Box" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Text"/>
+                <RadioButton x:Name="btnToolPencil" Content="✏️" ToolTip="Pencil (P) - Hold Shift for straight lines" Style="{StaticResource ToolbarToolBtn}" IsChecked="True" Click="Tool_Click" Tag="Pencil"/>
+                <RadioButton x:Name="btnToolArrow" Content="↗️" ToolTip="Arrow (A)" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Arrow"/>
+                <RadioButton x:Name="btnToolRect" Content="▭" ToolTip="Rectangle (R)" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Rectangle"/>
+                <RadioButton x:Name="btnToolEllipse" Content="◯" ToolTip="Ellipse / Circle (E)" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Ellipse"/>
+                <RadioButton x:Name="btnToolHighlighter" Content="🖊️" ToolTip="Highlighter (H)" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Highlighter"/>
+                <RadioButton x:Name="btnToolBadge" Content="①" ToolTip="Step Counter Badge (B)" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Badge"/>
+                <RadioButton x:Name="btnToolText" Content="🔤" ToolTip="Text Box (T)" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Text"/>
 
                 <Rectangle Width="1" Height="20" Fill="#44FFFFFF" Margin="6,0"/>
 
@@ -136,8 +141,9 @@
 
                 <!-- Actions -->
                 <Button Content="↩️" ToolTip="Undo (Ctrl+Z)" Click="Undo_Click" Style="{StaticResource ToolbarActionBtn}"/>
+                <Button Content="📸" ToolTip="Copy Screenshot to Clipboard" Click="CopyScreenshot_Click" Style="{StaticResource ToolbarActionBtn}"/>
                 <Button Content="🗑️" ToolTip="Clear Screen" Click="Clear_Click" Style="{StaticResource ToolbarActionBtn}"/>
-                <Button Content="❌" ToolTip="Exit Drawing Mode (RightCtrl+F10)" Click="Exit_Click" Style="{StaticResource ToolbarActionBtn}" Foreground="#FF6B6B"/>
+                <Button Content="❌" ToolTip="Exit Drawing Mode (Esc)" Click="Exit_Click" Style="{StaticResource ToolbarActionBtn}" Foreground="#FF6B6B"/>
             </StackPanel>
         </Border>
     </Grid>

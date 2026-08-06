@@ -16,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
@@ -908,6 +909,15 @@ namespace KeyNStroke
             label.FontStretch = settings.LabelFont.Stretch;
             label.FontStyle = settings.LabelFont.Style;
             label.FontWeight = settings.LabelFont.Weight;
+
+            label.Effect = new DropShadowEffect
+            {
+                Color = Colors.Black,
+                Direction = 270,
+                ShadowDepth = 3,
+                BlurRadius = 8,
+                Opacity = 0.6
+            };
 
             if (settings.LabelTextAlignment == TextAlignment.Left)
             {
