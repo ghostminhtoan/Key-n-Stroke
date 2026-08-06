@@ -607,7 +607,7 @@ namespace KeyNStroke
             set { i.keystrokeMethod = value; OnSettingChanged("KeystrokeMethod"); }
         }
 
-        public bool EnableAnnotateLineDefault = false;
+        public bool EnableAnnotateLineDefault = true;
         public bool EnableAnnotateLine
         {
             get { return Or(i.enableAnnotateLine, EnableAnnotateLineDefault); }

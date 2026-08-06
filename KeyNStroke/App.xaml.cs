@@ -190,6 +190,7 @@ namespace KeyNStroke
         public string StandbyShortcut;
         public string ToggleKeystrokeHistoryShortcut;
         public string ToggleUiShortcut;
+        public string AnnotateLineShortcut;
 
         void m_KeystrokeEvent(KeystrokeEventArgs e)
         {
@@ -223,6 +224,15 @@ namespace KeyNStroke
                 {
                     showSettingsWindow();
                 }
+                return true;
+            }
+            if (AnnotateLineShortcut != null && KeystrokeDisplay.ShortcutMatches(AnnotateLineShortcut, pressed))
+            {
+                if (AnnotateLineWindow == null)
+                {
+                    EnableAnnotateLine();
+                }
+                AnnotateLineWindow?.ToggleDrawingMode();
                 return true;
             }
             return false;
@@ -264,6 +274,18 @@ namespace KeyNStroke
             }
         }
 
+        public void SetAnnotateLineShortcut(string shortcut)
+        {
+            if (KeystrokeDisplay.ValidateShortcutSetting(shortcut))
+            {
+                AnnotateLineShortcut = shortcut;
+            }
+            else
+            {
+                AnnotateLineShortcut = mySettings.AnnotateLineShortcutDefault;
+            }
+        }
+
         #endregion
 
         #region OnSettingChanged
@@ -302,6 +324,9 @@ namespace KeyNStroke
                     break;
                 case "ToggleUiShortcut":
                     SetToggleUiShortcut(mySettings.ToggleUiShortcut);
+                    break;
+                case "AnnotateLineShortcut":
+                    SetAnnotateLineShortcut(mySettings.AnnotateLineShortcut);
                     break;
                 case "GlobalKey":
                     if (myKeyboardHook != null)
