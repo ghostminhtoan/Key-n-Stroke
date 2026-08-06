@@ -250,9 +250,17 @@ namespace KeyNStroke
 
         public SettingsStore()
         {
-            const string SETTINGS_PATH = "Key-n-Stroke/settings.json";
-            string appldatapath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            configpath = Path.Combine(appldatapath, SETTINGS_PATH);
+            string portablePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
+            string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Key-n-Stroke", "settings.json");
+
+            if (File.Exists(portablePath) || !File.Exists(appDataPath))
+            {
+                configpath = portablePath;
+            }
+            else
+            {
+                configpath = appDataPath;
+            }
         }
 
         string configpath;
