@@ -197,18 +197,32 @@ namespace KeyNStroke
             {
                 drawWindow = new DrawWindow(mySettings);
             }
-            if (drawnFromAnnotate != null && targetCanvas is Canvas srcCanvas)
+            if (drawnFromAnnotate != null)
             {
-                // Chụp màn hình nền phía sau (không bao gồm Toolbar vẽ)
-                int width = (int)SystemParameters.VirtualScreenWidth;
-                int height = (int)SystemParameters.VirtualScreenHeight;
-                if (srcCanvas.ActualWidth > 0) width = (int)srcCanvas.ActualWidth;
-                if (srcCanvas.ActualHeight > 0) height = (int)srcCanvas.ActualHeight;
+                // Chụp màn hình nền thực tế của Windows (desktop)
+                int screenWidth = (int)SystemParameters.PrimaryScreenWidth;
+                int screenHeight = (int)SystemParameters.PrimaryScreenHeight;
 
-                RenderTargetBitmap rtb = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
-                rtb.Render(srcCanvas);
-                
-                drawWindow.ImportFromAnnotate(drawnFromAnnotate, rtb);
+                using (System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(screenWidth, screenHeight))
+                {
+                    using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp))
+                    {
+                        g.CopyFromScreen(0, 0, 0, 0, bmp.Size);
+                    }
+                    
+                    // Chuyển Bitmap thành BitmapSource của WPF
+                    var handle = bmp.GetHbitmap();
+                    try
+                    {
+                        ImageSource imgSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                            handle, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                        drawWindow.ImportFromAnnotate(drawnFromAnnotate, imgSource);
+                    }
+                    finally
+                    {
+                        DeleteObject(handle);
+                    }
+                }
             }
             if (drawWindow.WindowState == WindowState.Minimized)
             {
@@ -576,6 +590,9 @@ namespace KeyNStroke
             myMouseHook = null;
         }
 
+        [System.Runtime.InteropServices.DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        public static extern bool DeleteObject([System.Runtime.InteropServices.In] IntPtr hObject);
         #endregion
     }
 }
