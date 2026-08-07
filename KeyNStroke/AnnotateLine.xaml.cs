@@ -192,9 +192,16 @@ namespace KeyNStroke
 
         private void Draw_Click(object sender, RoutedEventArgs e)
         {
-            // Tắt tạm thời chế độ vẽ tự do nền
+            var list = new List<UIElement>(drawnElements);
+            // Ẩn thanh công cụ trước khi chụp
+            annotationToolbar.Visibility = Visibility.Collapsed;
+            this.UpdateLayout();
+
+            ((App)Application.Current).showDrawWindow(list, drawingCanvas);
+
+            annotationToolbar.Visibility = Visibility.Visible;
             this.Hide();
-            ((App)Application.Current).showDrawWindow();
+            isDrawingActive = false;
         }
 
         private void Undo_Click(object sender, RoutedEventArgs e)

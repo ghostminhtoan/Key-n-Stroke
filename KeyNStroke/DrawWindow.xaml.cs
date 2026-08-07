@@ -78,7 +78,7 @@ namespace KeyNStroke
             UpdateColorSelectionUI(currentColor);
         }
 
-        private void AddNewTab()
+        private void AddNewTab(ImageSource bgImage = null)
         {
             var tabState = new TabState { Name = "Tab " + (tabs.Count + 1) };
             tabs.Add(tabState);
@@ -94,6 +94,17 @@ namespace KeyNStroke
             grid.MouseMove += Canvas_MouseMove;
             grid.MouseLeftButtonUp += Canvas_MouseLeftButtonUp;
 
+            if (bgImage != null)
+            {
+                grid.Children.Add(new Image 
+                { 
+                    Source = bgImage, 
+                    Stretch = Stretch.Uniform,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Top
+                });
+            }
+
             var canvas = new Canvas 
             { 
                 Background = Brushes.Transparent,
@@ -105,6 +116,134 @@ namespace KeyNStroke
             tabControl.Items.Add(tabItem);
             tabControl.SelectedItem = tabItem;
             currentTabState = tabState;
+        }
+
+        public void ImportFromAnnotate(List<UIElement> elements, ImageSource bgImage)
+        {
+            AddNewTab(bgImage);
+            var canvas = CurrentCanvas;
+            if (canvas == null) return;
+
+            foreach (var elem in elements)
+            {
+                // Clone hoặc copy element sang canvas mới
+                UIElement cloned = CloneElement(elem);
+                if (cloned != null)
+                {
+                    canvas.Children.Add(cloned);
+                    currentTabState.DrawnElements.Add(cloned);
+                }
+            }
+        }
+
+        private UIElement CloneElement(UIElement elem)
+        {
+            if (elem is Polyline poly)
+            {
+                return new Polyline
+                {
+                    Stroke = poly.Stroke,
+                    StrokeThickness = poly.StrokeThickness,
+                    StrokeLineJoin = poly.StrokeLineJoin,
+                    StrokeStartLineCap = poly.StrokeStartLineCap,
+                    StrokeEndLineCap = poly.StrokeEndLineCap,
+                    Points = new PointCollection(poly.Points)
+                };
+            }
+            if (elem is Path path)
+            {
+                return new Path
+                {
+                    Stroke = path.Stroke,
+                    StrokeThickness = path.StrokeThickness,
+                    Fill = path.Fill,
+                    StrokeLineJoin = path.StrokeLineJoin,
+                    StrokeStartLineCap = path.StrokeStartLineCap,
+                    StrokeEndLineCap = path.StrokeEndLineCap,
+                    Data = path.Data.Clone()
+                };
+            }
+            if (elem is Rectangle rect)
+            {
+                var r = new Rectangle
+                {
+                    Stroke = rect.Stroke,
+                    StrokeThickness = rect.StrokeThickness,
+                    Fill = rect.Fill,
+                    Width = rect.Width,
+                    Height = rect.Height
+                };
+                Canvas.SetLeft(r, Canvas.GetLeft(rect));
+                Canvas.SetTop(r, Canvas.GetTop(rect));
+                return r;
+            }
+            if (elem is Ellipse el)
+            {
+                var e = new Ellipse
+                {
+                    Stroke = el.Stroke,
+                    StrokeThickness = el.StrokeThickness,
+                    Fill = el.Fill,
+                    Width = el.Width,
+                    Height = el.Height
+                };
+                Canvas.SetLeft(e, Canvas.GetLeft(el));
+                Canvas.SetTop(e, Canvas.GetTop(el));
+                return e;
+            }
+            if (elem is TextBox tb)
+            {
+                var t = new TextBox
+                {
+                    Background = tb.Background,
+                    Foreground = tb.Foreground,
+                    FontSize = tb.FontSize,
+                    FontWeight = tb.FontWeight,
+                    BorderBrush = tb.BorderBrush,
+                    BorderThickness = tb.BorderThickness,
+                    Padding = tb.Padding,
+                    Text = tb.Text,
+                    MinWidth = tb.MinWidth
+                };
+                t.KeyDown += (s, ev) =>
+                {
+                    if (ev.Key == Key.Enter)
+                    {
+                        Keyboard.ClearFocus();
+                    }
+                };
+                Canvas.SetLeft(t, Canvas.GetLeft(tb));
+                Canvas.SetTop(t, Canvas.GetTop(tb));
+                return t;
+            }
+            if (elem is Border b && b.Tag?.ToString() == "Badge")
+            {
+                var badge = new Border
+                {
+                    Width = b.Width,
+                    Height = b.Height,
+                    CornerRadius = b.CornerRadius,
+                    Background = b.Background,
+                    Effect = b.Effect,
+                    Tag = "Badge"
+                };
+                if (b.Child is TextBlock txt)
+                {
+                    badge.Child = new TextBlock
+                    {
+                        Text = txt.Text,
+                        FontSize = txt.FontSize,
+                        FontWeight = txt.FontWeight,
+                        Foreground = txt.Foreground,
+                        HorizontalAlignment = txt.HorizontalAlignment,
+                        VerticalAlignment = txt.VerticalAlignment
+                    };
+                }
+                Canvas.SetLeft(badge, Canvas.GetLeft(b));
+                Canvas.SetTop(badge, Canvas.GetTop(b));
+                return badge;
+            }
+            return null;
         }
 
         private Canvas CurrentCanvas

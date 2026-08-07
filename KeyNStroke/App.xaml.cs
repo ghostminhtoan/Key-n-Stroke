@@ -11,6 +11,9 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using KeyNStroke;
 
 namespace KeyNStroke
@@ -188,11 +191,24 @@ namespace KeyNStroke
 
         #region Draw Window
 
-        public void showDrawWindow()
+        public void showDrawWindow(List<UIElement> drawnFromAnnotate = null, UIElement targetCanvas = null)
         {
             if (drawWindow == null)
             {
                 drawWindow = new DrawWindow(mySettings);
+            }
+            if (drawnFromAnnotate != null && targetCanvas is Canvas srcCanvas)
+            {
+                // Chụp màn hình nền phía sau (không bao gồm Toolbar vẽ)
+                int width = (int)SystemParameters.VirtualScreenWidth;
+                int height = (int)SystemParameters.VirtualScreenHeight;
+                if (srcCanvas.ActualWidth > 0) width = (int)srcCanvas.ActualWidth;
+                if (srcCanvas.ActualHeight > 0) height = (int)srcCanvas.ActualHeight;
+
+                RenderTargetBitmap rtb = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+                rtb.Render(srcCanvas);
+                
+                drawWindow.ImportFromAnnotate(drawnFromAnnotate, rtb);
             }
             if (drawWindow.WindowState == WindowState.Minimized)
             {
