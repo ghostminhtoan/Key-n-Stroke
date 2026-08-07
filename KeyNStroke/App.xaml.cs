@@ -39,6 +39,7 @@ namespace KeyNStroke
         SettingsStore mySettings;
         Window welcomeWindow;
         Settings1 settingsWindow;
+        DrawWindow drawWindow;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -181,6 +182,30 @@ namespace KeyNStroke
         public void onWelcomeWindowClosed()
         {
             welcomeWindow = null;
+        }
+
+        #endregion
+
+        #region Draw Window
+
+        public void showDrawWindow()
+        {
+            if (drawWindow == null)
+            {
+                drawWindow = new DrawWindow(mySettings);
+            }
+            if (drawWindow.WindowState == WindowState.Minimized)
+            {
+                drawWindow.WindowState = WindowState.Normal;
+            }
+            drawWindow.Show();
+            drawWindow.Activate();
+            drawWindow.Focus();
+        }
+
+        public void onDrawWindowClosed()
+        {
+            drawWindow = null;
         }
 
         #endregion

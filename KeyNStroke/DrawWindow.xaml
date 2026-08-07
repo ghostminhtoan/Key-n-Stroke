@@ -1,20 +1,16 @@
-<Window x:Class="KeyNStroke.AnnotateLine"
+<Window x:Class="KeyNStroke.DrawWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:KeyNStroke"
         mc:Ignorable="d"
-        Title="AnnotateLine"
-        AllowsTransparency="True"
-        Topmost="True"
-        ShowInTaskbar="False"
-        WindowStyle="None"
-        ResizeMode="NoResize"
-        Background="Transparent" 
-        Loaded="Window_Loaded" 
-        Closed="Window_Closed"
-        KeyDown="Window_KeyDown">
+        Title="Draw"
+        Height="700" 
+        Width="1000"
+        WindowStartupLocation="CenterScreen"
+        KeyDown="Window_KeyDown"
+        Background="#1E1E24">
     <Window.Resources>
         <Style x:Key="ToolbarToolBtn" TargetType="RadioButton">
             <Setter Property="Width" Value="32"/>
@@ -84,32 +80,22 @@
             </Setter>
         </Style>
     </Window.Resources>
-
-    <Grid x:Name="mainGrid" Background="#01000000" MouseLeftButtonDown="Grid_MouseLeftButtonDown" MouseMove="Grid_MouseMove" MouseLeftButtonUp="Grid_MouseLeftButtonUp">
-        <!-- Canvas for drawn objects -->
-        <Canvas x:Name="drawingCanvas" />
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
         <!-- Floating Annotation Toolbar -->
-        <Border x:Name="annotationToolbar" 
-                HorizontalAlignment="Center" 
-                VerticalAlignment="Top" 
-                Margin="0,15,0,0" 
+        <Border Grid.Row="0"
                 Background="#EE1E1E24" 
-                CornerRadius="8" 
                 Padding="8,5" 
                 BorderBrush="#44FFFFFF" 
-                BorderThickness="1">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="12" ShadowDepth="3" Opacity="0.5" Color="Black"/>
-            </Border.Effect>
+                BorderThickness="0,0,0,1">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <!-- Drag Grip -->
-                <Border x:Name="dragGrip" Cursor="SizeAll" Margin="2,0,6,0" VerticalAlignment="Center" MouseLeftButtonDown="DragGrip_MouseDown" MouseMove="DragGrip_MouseMove" MouseLeftButtonUp="DragGrip_MouseUp" ToolTip="Drag to move toolbar">
-                    <TextBlock Text="⋮⋮" Foreground="#88FFFFFF" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
-                </Border>
-
                 <!-- Tool Selection Buttons -->
-                <RadioButton x:Name="btnToolPencil" Content="✏️" ToolTip="Pencil (P) - Hold Shift for straight lines" Style="{StaticResource ToolbarToolBtn}" IsChecked="True" Click="Tool_Click" Tag="Pencil"/>
+                <RadioButton x:Name="btnToolPencil" Content="✏️" ToolTip="Pencil (P)" Style="{StaticResource ToolbarToolBtn}" IsChecked="True" Click="Tool_Click" Tag="Pencil"/>
                 <RadioButton x:Name="btnToolArrow" Content="↗️" ToolTip="Arrow (A)" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Arrow"/>
                 <RadioButton x:Name="btnToolRect" Content="▭" ToolTip="Rectangle (R)" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Rectangle"/>
                 <RadioButton x:Name="btnToolEllipse" Content="◯" ToolTip="Ellipse / Circle (E)" Style="{StaticResource ToolbarToolBtn}" Click="Tool_Click" Tag="Ellipse"/>
@@ -141,8 +127,24 @@
                 <!-- Actions -->
                 <Button Content="↩️" ToolTip="Undo (Ctrl+Z)" Click="Undo_Click" Style="{StaticResource ToolbarActionBtn}"/>
                 <Button Content="🗑️" ToolTip="Clear Screen" Click="Clear_Click" Style="{StaticResource ToolbarActionBtn}"/>
-                <Button Content="❌" ToolTip="Exit Drawing Mode (Esc)" Click="Exit_Click" Style="{StaticResource ToolbarActionBtn}" Foreground="#FF6B6B"/>
+                
+                <Rectangle Width="1" Height="20" Fill="#44FFFFFF" Margin="6,0"/>
+                
+                <!-- Tab Actions -->
+                <Button Content="➕" ToolTip="New Tab" Click="NewTab_Click" Style="{StaticResource ToolbarActionBtn}"/>
+                <Button Content="❌" ToolTip="Close Current Tab" Click="CloseTab_Click" Style="{StaticResource ToolbarActionBtn}" Foreground="#FF6B6B"/>
+                
+                <Rectangle Width="1" Height="20" Fill="#44FFFFFF" Margin="6,0"/>
+                
+                <Button Content="🗕" ToolTip="Minimize" Click="Exit_Click" Style="{StaticResource ToolbarActionBtn}"/>
             </StackPanel>
         </Border>
+
+        <!-- Tab Control for multiple drawing boards -->
+        <TabControl x:Name="tabControl" 
+                    Grid.Row="1"
+                    Background="#121214"
+                    BorderThickness="0"
+                    SelectionChanged="tabControl_SelectionChanged"/>
     </Grid>
 </Window>

@@ -219,52 +219,7 @@ namespace KeyNStroke
             }
         }
 
-        private void CopyScreenshot_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                annotationToolbar.Visibility = Visibility.Collapsed;
-                this.UpdateLayout();
 
-                int width = (int)drawingCanvas.ActualWidth;
-                int height = (int)drawingCanvas.ActualHeight;
-
-                if (width <= 0 || height <= 0)
-                {
-                    width = (int)SystemParameters.VirtualScreenWidth;
-                    height = (int)SystemParameters.VirtualScreenHeight;
-                }
-
-                RenderTargetBitmap rtb = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
-                rtb.Render(drawingCanvas);
-
-                PngBitmapEncoder encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(rtb));
-                using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
-                {
-                    encoder.Save(ms);
-                    ms.Position = 0;
-                    BitmapImage bitmapImage = new BitmapImage();
-                    bitmapImage.BeginInit();
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmapImage.StreamSource = ms;
-                    bitmapImage.EndInit();
-
-                    DataObject dataObj = new DataObject();
-                    dataObj.SetData(DataFormats.Bitmap, bitmapImage, true);
-                    dataObj.SetData("PNG", ms, true);
-                    Clipboard.SetDataObject(dataObj, true);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.e("AL", "CopyScreenshot failed: " + ex.Message);
-            }
-            finally
-            {
-                annotationToolbar.Visibility = Visibility.Visible;
-            }
-        }
 
         private bool isToolbarDragging = false;
         private Point toolbarDragStartPos;

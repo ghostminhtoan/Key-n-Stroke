@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
@@ -103,6 +103,11 @@ namespace KeyNStroke
         private void ButtonHideThisWindow_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void ButtonDraw_Click(object sender, RoutedEventArgs e)
+        {
+            ((App)Application.Current).showDrawWindow();
         }
 
         private void ButtonExitApplication_Click(object sender, RoutedEventArgs e)
