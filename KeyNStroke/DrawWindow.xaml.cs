@@ -32,6 +32,7 @@ namespace KeyNStroke
             public List<List<UIElementState>> UndoStack { get; } = new List<List<UIElementState>>();
             public List<List<UIElementState>> RedoStack { get; } = new List<List<UIElementState>>();
             public int BadgeCounter { get; set; } = 1;
+            public double ZoomFactor { get; set; } = 1.0;
         }
 
         private class UIElementState
@@ -93,7 +94,11 @@ namespace KeyNStroke
             grid.MouseMove += Canvas_MouseMove;
             grid.MouseLeftButtonUp += Canvas_MouseLeftButtonUp;
 
-            var canvas = new Canvas { Background = Brushes.Transparent };
+            var canvas = new Canvas 
+            { 
+                Background = Brushes.Transparent,
+                RenderTransform = new ScaleTransform(1.0, 1.0)
+            };
             grid.Children.Add(canvas);
             tabItem.Content = grid;
 
@@ -768,10 +773,46 @@ namespace KeyNStroke
                 PerformRedo();
                 e.Handled = true;
             }
+            else if ((e.Key == Key.OemPlus || e.Key == Key.Add) && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                ZoomIn();
+                e.Handled = true;
+            }
+            else if ((e.Key == Key.OemMinus || e.Key == Key.Subtract) && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                ZoomOut();
+                e.Handled = true;
+            }
             else if (e.Key == Key.Escape)
             {
                 this.WindowState = WindowState.Minimized;
                 e.Handled = true;
+            }
+        }
+
+        private void ZoomIn()
+        {
+            if (currentTabState == null) return;
+            double newZoom = Math.Min(10.0, currentTabState.ZoomFactor + 0.1);
+            ApplyZoom(newZoom);
+        }
+
+        private void ZoomOut()
+        {
+            if (currentTabState == null) return;
+            double newZoom = Math.Max(0.3, currentTabState.ZoomFactor - 0.1);
+            ApplyZoom(newZoom);
+        }
+
+        private void ApplyZoom(double factor)
+        {
+            if (currentTabState == null) return;
+            currentTabState.ZoomFactor = factor;
+            var canvas = CurrentCanvas;
+            if (canvas != null && canvas.RenderTransform is ScaleTransform st)
+            {
+                st.ScaleX = factor;
+                st.ScaleY = factor;
             }
         }
 

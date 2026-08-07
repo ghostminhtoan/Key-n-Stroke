@@ -75,14 +75,6 @@
                 Width="129"
                 Height="24"
                 VerticalAlignment="Bottom" />
-        <Button x:Name="ButtonDraw"
-                Content="Draw"
-                Margin="0,0,305,10.333"
-                Click="ButtonDraw_Click"
-                HorizontalAlignment="Right"
-                Width="129"
-                Height="24"
-                VerticalAlignment="Bottom"/>
         <Button x:Name="ButtonHideThisWindow"
                 Content="Let's go"
                 Margin="0,0,9.667,10.333"

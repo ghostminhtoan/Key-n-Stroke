@@ -190,6 +190,13 @@ namespace KeyNStroke
             }
         }
 
+        private void Draw_Click(object sender, RoutedEventArgs e)
+        {
+            // Tắt tạm thời chế độ vẽ tự do nền
+            this.Hide();
+            ((App)Application.Current).showDrawWindow();
+        }
+
         private void Undo_Click(object sender, RoutedEventArgs e)
         {
             if (drawnElements.Count > 0)

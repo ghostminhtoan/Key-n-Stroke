@@ -105,11 +105,6 @@ namespace KeyNStroke
             Close();
         }
 
-        private void ButtonDraw_Click(object sender, RoutedEventArgs e)
-        {
-            ((App)Application.Current).showDrawWindow();
-        }
-
         private void ButtonExitApplication_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Application.Current.Shutdown();

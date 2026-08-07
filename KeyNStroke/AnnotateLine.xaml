@@ -139,6 +139,7 @@
                 <Rectangle Width="1" Height="20" Fill="#44FFFFFF" Margin="6,0"/>
 
                 <!-- Actions -->
+                <Button Content="🎨" ToolTip="Draw (Open Draw Tab Window)" Click="Draw_Click" Style="{StaticResource ToolbarActionBtn}"/>
                 <Button Content="↩️" ToolTip="Undo (Ctrl+Z)" Click="Undo_Click" Style="{StaticResource ToolbarActionBtn}"/>
                 <Button Content="🗑️" ToolTip="Clear Screen" Click="Clear_Click" Style="{StaticResource ToolbarActionBtn}"/>
                 <Button Content="❌" ToolTip="Exit Drawing Mode (Esc)" Click="Exit_Click" Style="{StaticResource ToolbarActionBtn}" Foreground="#FF6B6B"/>
