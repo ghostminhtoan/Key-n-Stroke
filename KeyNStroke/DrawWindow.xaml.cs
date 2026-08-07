@@ -125,7 +125,8 @@ namespace KeyNStroke
             var canvas = CurrentCanvas;
             if (canvas == null) return;
 
-            SaveUndoState(); // Lưu trạng thái trống ban đầu của Tab
+            // Lưu trạng thái canvas rỗng trước khi nạp đối tượng vào UndoStack
+            SaveUndoState();
 
             foreach (var elem in elements)
             {
@@ -498,7 +499,25 @@ namespace KeyNStroke
             UIElement clickedElement = null;
             foreach (var elem in currentTabState.DrawnElements)
             {
-                if (elem.InputHitTest(e.GetPosition(elem)) != null)
+                Point posInElem = e.GetPosition(elem);
+                bool hit = false;
+                
+                if (elem is Polyline || elem is Path)
+                {
+                    // Hit test cho hình học nét vẽ bằng VisualTreeHelper.HitTest
+                    VisualTreeHelper.HitTest(elem, null, 
+                        new HitTestResultCallback(result => {
+                            hit = true;
+                            return HitTestResultBehavior.Stop;
+                        }), 
+                        new PointHitTestParameters(posInElem));
+                }
+                else
+                {
+                    hit = elem.InputHitTest(posInElem) != null;
+                }
+
+                if (hit)
                 {
                     clickedElement = elem;
                     break;
