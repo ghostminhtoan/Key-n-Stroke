@@ -502,15 +502,29 @@ namespace KeyNStroke
                 Point posInElem = e.GetPosition(elem);
                 bool hit = false;
                 
-                if (elem is Polyline || elem is Path)
+                if (elem is Polyline poly)
                 {
-                    // Hit test cho hình học nét vẽ bằng VisualTreeHelper.HitTest
-                    VisualTreeHelper.HitTest(elem, null, 
-                        new HitTestResultCallback(result => {
-                            hit = true;
-                            return HitTestResultBehavior.Stop;
-                        }), 
-                        new PointHitTestParameters(posInElem));
+                    // Tạo một StreamGeometry mô phỏng polyline để gọi StrokeContains
+                    StreamGeometry geom = new StreamGeometry();
+                    using (StreamGeometryContext ctx = geom.Open())
+                    {
+                        if (poly.Points.Count > 0)
+                        {
+                            ctx.BeginFigure(poly.Points[0], false, false);
+                            for (int i = 1; i < poly.Points.Count; i++)
+                            {
+                                ctx.LineTo(poly.Points[i], true, false);
+                            }
+                        }
+                    }
+                    // Tăng độ dày ảo lên 15px để dễ bấm trúng nét vẽ mảnh
+                    Pen testPen = new Pen(Brushes.Black, Math.Max(poly.StrokeThickness, 15.0));
+                    hit = geom.StrokeContains(testPen, posInElem);
+                }
+                else if (elem is Path path && path.Data != null)
+                {
+                    Pen testPen = new Pen(Brushes.Black, Math.Max(path.StrokeThickness, 15.0));
+                    hit = path.Data.StrokeContains(testPen, posInElem) || path.Data.FillContains(posInElem);
                 }
                 else
                 {
