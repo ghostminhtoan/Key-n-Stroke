@@ -69,6 +69,7 @@ namespace KeyNStroke
         private UIElement currentPreviewElement = null;
         private Point startPoint;
         private bool isDrawing = false;
+        private UIElement selectedElement = null;
 
         public DrawWindow(SettingsStore s)
         {
@@ -123,6 +124,8 @@ namespace KeyNStroke
             AddNewTab(bgImage);
             var canvas = CurrentCanvas;
             if (canvas == null) return;
+
+            SaveUndoState(); // Lưu trạng thái trống ban đầu của Tab
 
             foreach (var elem in elements)
             {
@@ -504,6 +507,7 @@ namespace KeyNStroke
 
             if (clickedElement != null)
             {
+                selectedElement = clickedElement;
                 activeDragElement = clickedElement;
                 dragStartMousePos = e.GetPosition(canvas);
                 dragStartElementPos = new Point(Canvas.GetLeft(clickedElement), Canvas.GetTop(clickedElement));
@@ -539,6 +543,10 @@ namespace KeyNStroke
 
                 e.Handled = true;
                 return;
+            }
+            else
+            {
+                selectedElement = null;
             }
 
             // Start drawing new element
@@ -921,6 +929,21 @@ namespace KeyNStroke
             {
                 ZoomOut();
                 e.Handled = true;
+            }
+            else if (e.Key == Key.Delete)
+            {
+                if (selectedElement != null && currentTabState != null)
+                {
+                    var canvas = CurrentCanvas;
+                    if (canvas != null)
+                    {
+                        SaveUndoState();
+                        canvas.Children.Remove(selectedElement);
+                        currentTabState.DrawnElements.Remove(selectedElement);
+                        selectedElement = null;
+                        e.Handled = true;
+                    }
+                }
             }
             else if (e.Key == Key.Escape)
             {
