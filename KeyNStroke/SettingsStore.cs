@@ -214,6 +214,7 @@ namespace KeyNStroke
         [DataMember] public Nullable<double> cursorIndicatorEdgeStrokeThickness = null;
         [DataMember] public Nullable<ButtonIndicatorType> buttonIndicator = null;
         [DataMember] public Nullable<double> buttonIndicatorScaling = null;
+        [DataMember] public Nullable<double> buttonIndicatorOpacity = null;
         [DataMember] public Nullable<double> buttonIndicatorPositionAngle = null;
         [DataMember] public Nullable<double> buttonIndicatorPositionDistance = null;
         [DataMember] public Nullable<bool> buttonIndicatorShowModifiers = null;
@@ -516,6 +517,13 @@ namespace KeyNStroke
             set { i.buttonIndicatorScaling = value; OnSettingChanged("ButtonIndicatorScaling"); }
         }
 
+        public double ButtonIndicatorOpacityDefault = 1.0;
+        public double ButtonIndicatorOpacity
+        {
+            get { return Or(i.buttonIndicatorOpacity, ButtonIndicatorOpacityDefault); }
+            set { i.buttonIndicatorOpacity = value; OnSettingChanged("ButtonIndicatorOpacity"); }
+        }
+
         public double ButtonIndicatorPositionAngleDefault = 0f;
         public double ButtonIndicatorPositionAngle
         {
@@ -756,6 +764,7 @@ namespace KeyNStroke
                 PropertyChanged(this, new PropertyChangedEventArgs("CursorIndicatorHideIfCustomCursor"));
                 PropertyChanged(this, new PropertyChangedEventArgs("ButtonIndicator"));
                 PropertyChanged(this, new PropertyChangedEventArgs("ButtonIndicatorScalingPercentage"));
+                PropertyChanged(this, new PropertyChangedEventArgs("ButtonIndicatorOpacity"));
                 PropertyChanged(this, new PropertyChangedEventArgs("ButtonIndicatorPositionAngle"));
                 PropertyChanged(this, new PropertyChangedEventArgs("ButtonIndicatorPositionDistance"));
                 PropertyChanged(this, new PropertyChangedEventArgs("ButtonIndicatorShowModifiers"));
@@ -892,6 +901,7 @@ CursorIndicatorEdgeStrokeThickness: {CursorIndicatorEdgeStrokeThickness}
 CursorIndicatorHideIfCustomCursor: {CursorIndicatorHideIfCustomCursor}
 ButtonIndicator:                 {ButtonIndicator}
 buttonIndicatorScalingPercentage:{ButtonIndicatorScaling}
+ButtonIndicatorOpacity:           {ButtonIndicatorOpacity}
 ButtonIndicatorPositionAngle:    {ButtonIndicatorPositionAngle}
 ButtonIndicatorPositionDistance: {ButtonIndicatorPositionDistance}
 ButtonIndicatorShowModifiers:    {ButtonIndicatorShowModifiers}
