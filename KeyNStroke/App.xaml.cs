@@ -67,7 +67,7 @@ namespace KeyNStroke
         {
             if (mySettings != null && appFilterTimer != null)
             {
-                appFilterTimer.Interval = TimeSpan.FromSeconds(mySettings.HistoryTimeout);
+                appFilterTimer.Interval = TimeSpan.FromMilliseconds(500);
             }
         }
 
@@ -109,7 +109,6 @@ namespace KeyNStroke
             if (string.IsNullOrEmpty(activeProc))
             {
                 filterModeAllows = true;
-                SetKeystrokeHistoryFromAppFilter(true);
                 UpdateWindowsVisibility();
                 return;
             }
@@ -130,22 +129,13 @@ namespace KeyNStroke
                 filterModeAllows = !inList;
             }
 
-            SetKeystrokeHistoryFromAppFilter(filterModeAllows);
             UpdateWindowsVisibility();
-        }
-
-        private void SetKeystrokeHistoryFromAppFilter(bool enabled)
-        {
-            if (mySettings.EnableKeystrokeHistory != enabled)
-            {
-                mySettings.EnableKeystrokeHistory = enabled;
-            }
         }
 
         private void AutoHideTimer_Tick(object sender, EventArgs e)
         {
             if (mySettings == null) return;
-            if (!mySettings.EnableAutoHide) return;
+            if (!mySettings.EnableHistoryTimeout) return;
 
             if ((DateTime.Now - lastActivityTime).TotalSeconds >= mySettings.HistoryTimeout)
             {
@@ -169,7 +159,7 @@ namespace KeyNStroke
             bool shouldBeVisible = filterModeAllows && !mySettings.Standby;
 
             // Nếu đang trong thời gian autohide thì không tự động show KeystrokeHistoryWindow
-            bool isAutoHideTime = mySettings.EnableAutoHide && (DateTime.Now - lastActivityTime).TotalSeconds >= mySettings.AutoHideTimeout;
+            bool isAutoHideTime = mySettings.EnableHistoryTimeout && (DateTime.Now - lastActivityTime).TotalSeconds >= mySettings.HistoryTimeout;
 
             if (shouldBeVisible)
             {
@@ -420,7 +410,11 @@ namespace KeyNStroke
             lastActivityTime = DateTime.Now;
             if (mySettings != null && mySettings.EnableKeystrokeHistory && filterModeAllows && !mySettings.Standby)
             {
-                if (KeystrokeHistoryWindow != null && !KeystrokeHistoryWindow.IsVisible)
+                if (KeystrokeHistoryWindow == null)
+                {
+                    EnableKeystrokeHistory();
+                }
+                else if (!KeystrokeHistoryWindow.IsVisible)
                 {
                     KeystrokeHistoryWindow.Show();
                 }
@@ -575,7 +569,7 @@ namespace KeyNStroke
                 case "FilterAppsList":
                 case "BlacklistedAppsList":
                 case "WhitelistedAppsList":
-                case "EnableAutoHide":
+                case "EnableHistoryTimeout":
                     UpdateWindowsVisibility();
                     break;
                 case "HistoryTimeout":

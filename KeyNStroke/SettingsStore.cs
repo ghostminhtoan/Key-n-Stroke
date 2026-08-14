@@ -424,7 +424,7 @@ namespace KeyNStroke
             set { i.historyLength = value; OnSettingChanged("HistoryLength"); }
         }
 
-        public double HistoryTimeoutDefault = 10.0; // seconds
+        public double HistoryTimeoutDefault = 3.0; // seconds
         public double HistoryTimeout
         {
             get { return Or(i.historyTimeout, HistoryTimeoutDefault); }
