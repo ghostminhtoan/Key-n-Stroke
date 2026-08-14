@@ -14,6 +14,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 using KeyNStroke;
 
 namespace KeyNStroke
@@ -44,6 +46,153 @@ namespace KeyNStroke
         Settings1 settingsWindow;
         DrawWindow drawWindow;
 
+        private System.Windows.Threading.DispatcherTimer appFilterTimer;
+        private System.Windows.Threading.DispatcherTimer autoHideTimer;
+        private DateTime lastActivityTime = DateTime.Now;
+
+        private void InitTimers()
+        {
+            appFilterTimer = new System.Windows.Threading.DispatcherTimer();
+            appFilterTimer.Interval = TimeSpan.FromMilliseconds(500);
+            appFilterTimer.Tick += AppFilterTimer_Tick;
+            appFilterTimer.Start();
+
+            autoHideTimer = new System.Windows.Threading.DispatcherTimer();
+            autoHideTimer.Interval = TimeSpan.FromMilliseconds(500);
+            autoHideTimer.Tick += AutoHideTimer_Tick;
+            autoHideTimer.Start();
+        }
+
+        [DllImport("user32.dll")]
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+
+        private string GetActiveWindowProcessName()
+        {
+            IntPtr hwnd = GetForegroundWindow();
+            if (hwnd == IntPtr.Zero) return "";
+            uint pid;
+            GetWindowThreadProcessId(hwnd, out pid);
+            try
+            {
+                using (var proc = Process.GetProcessById((int)pid))
+                {
+                    return proc.ProcessName;
+                }
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private bool filterModeAllows = true;
+
+        private void AppFilterTimer_Tick(object sender, EventArgs e)
+        {
+            if (mySettings == null) return;
+            if (!mySettings.EnableAppFilter)
+            {
+                filterModeAllows = true;
+                UpdateWindowsVisibility();
+                return;
+            }
+
+            string activeProc = GetActiveWindowProcessName();
+            if (string.IsNullOrEmpty(activeProc))
+            {
+                filterModeAllows = true;
+                UpdateWindowsVisibility();
+                return;
+            }
+
+            string[] list = (mySettings.FilterAppsList ?? "")
+                .Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .ToArray();
+
+            bool inList = list.Any(x => string.Equals(x, activeProc, StringComparison.OrdinalIgnoreCase));
+
+            if (mySettings.UseWhitelistMode)
+            {
+                filterModeAllows = inList;
+            }
+            else
+            {
+                filterModeAllows = !inList;
+            }
+
+            UpdateWindowsVisibility();
+        }
+
+        private void AutoHideTimer_Tick(object sender, EventArgs e)
+        {
+            if (mySettings == null) return;
+            if (!mySettings.EnableAutoHide) return;
+
+            if ((DateTime.Now - lastActivityTime).TotalSeconds >= mySettings.AutoHideTimeout)
+            {
+                if (KeystrokeHistoryWindow != null && KeystrokeHistoryWindow.IsVisible)
+                {
+                    KeystrokeHistoryWindow.Hide();
+                }
+            }
+        }
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        private void UpdateWindowsVisibility()
+        {
+            if (mySettings == null) return;
+
+            bool shouldBeVisible = filterModeAllows && !mySettings.Standby;
+
+            // Nếu đang trong thời gian autohide thì không tự động show KeystrokeHistoryWindow
+            bool isAutoHideTime = mySettings.EnableAutoHide && (DateTime.Now - lastActivityTime).TotalSeconds >= mySettings.AutoHideTimeout;
+
+            if (shouldBeVisible)
+            {
+                if (mySettings.EnableKeystrokeHistory)
+                {
+                    if (KeystrokeHistoryWindow == null)
+                    {
+                        EnableKeystrokeHistory();
+                    }
+                    else if (!KeystrokeHistoryWindow.IsVisible && !isAutoHideTime)
+                    {
+                        KeystrokeHistoryWindow.Show();
+                    }
+                }
+                if (mySettings.EnableCursorIndicator && CursorIndicatorWindow == null)
+                {
+                    EnableCursorIndicator();
+                }
+                if (mySettings.ButtonIndicator != ButtonIndicatorType.Disabled && ButtonIndicatorWindow == null)
+                {
+                    EnableButtonIndicator();
+                }
+            }
+            else
+            {
+                // Tạm thời hide các window overlay
+                if (KeystrokeHistoryWindow != null && KeystrokeHistoryWindow.IsVisible)
+                {
+                    KeystrokeHistoryWindow.Hide();
+                }
+                if (CursorIndicatorWindow != null && CursorIndicatorWindow.IsVisible)
+                {
+                    CursorIndicatorWindow.Hide();
+                }
+                if (ButtonIndicatorWindow != null && ButtonIndicatorWindow.Visible)
+                {
+                    ButtonIndicatorWindow.Hide();
+                }
+            }
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             Log.SetTagFilter("UPDATE");
@@ -64,6 +213,7 @@ namespace KeyNStroke
             mySettings.CallPropertyChangedForAllProperties();
 
             makeNotifyIcon();
+            InitTimers();
 
             if (mySettings.WelcomeOnStartup)
             {
@@ -249,6 +399,15 @@ namespace KeyNStroke
 
         void m_KeystrokeEvent(KeystrokeEventArgs e)
         {
+            lastActivityTime = DateTime.Now;
+            if (mySettings != null && mySettings.EnableKeystrokeHistory && filterModeAllows && !mySettings.Standby)
+            {
+                if (KeystrokeHistoryWindow != null && !KeystrokeHistoryWindow.IsVisible)
+                {
+                    KeystrokeHistoryWindow.Show();
+                }
+            }
+
             string pressed = e.ShortcutIdentifier();
             e.raw.preventDefault = e.raw.preventDefault || CheckForTrigger(pressed);
             if (KeystrokeHistoryWindow != null)

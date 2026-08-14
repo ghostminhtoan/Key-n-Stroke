@@ -459,6 +459,62 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
+            <TabItem Header="Advanced Settings">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100*" />
+                        <ColumnDefinition Width="100*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="5">
+                        <GroupBox Header="Auto-hide Overlay">
+                            <StackPanel>
+                                <CheckBox x:Name="cb_enableAutoHide"
+                                          IsChecked="{Binding EnableAutoHide}">Enable Auto-hide</CheckBox>
+                                <uc:LabeledSlider x:Name="slider_autoHideTimeout"
+                                                  Title="Timeout (seconds)"
+                                                  Minimum="1"
+                                                  Maximum="60"
+                                                  Value="{Binding AutoHideTimeout, Mode=TwoWay}" />
+                                <TextBlock TextWrapping="Wrap" Margin="5,5,5,0" FontSize="11" Foreground="Gray">
+                                    Automatically hides the overlay when no keys are pressed for the specified duration. Pressing any key will show it again.
+                                </TextBlock>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Sensitive Information Filter (Password)">
+                            <StackPanel Margin="0,5,0,0">
+                                <CheckBox x:Name="cb_enablePasswordFilter"
+                                          IsChecked="{Binding EnablePasswordFilter}">Mask typed characters as '*'</CheckBox>
+                                <TextBlock TextWrapping="Wrap" Margin="5,5,5,0" FontSize="11" Foreground="Gray">
+                                    Prevents sensitive input from being revealed on screen by displaying '*' instead of normal letters/numbers.
+                                </TextBlock>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="5">
+                        <GroupBox Header="App Blacklist / Whitelist">
+                            <StackPanel>
+                                <CheckBox x:Name="cb_enableAppFilter"
+                                          IsChecked="{Binding EnableAppFilter}">Enable App Filter</CheckBox>
+                                <CheckBox x:Name="cb_useWhitelistMode"
+                                          IsChecked="{Binding UseWhitelistMode}"
+                                          Margin="15,5,0,0"
+                                          IsEnabled="{Binding EnableAppFilter}">Use Whitelist mode (Only show in these apps)</CheckBox>
+                                <TextBlock TextWrapping="Wrap" Margin="5,10,5,0">List of App process names (comma separated):</TextBlock>
+                                <TextBox x:Name="tb_filterAppsList"
+                                         Text="{Binding FilterAppsList, Mode=TwoWay}"
+                                         Margin="5"
+                                         Height="40"
+                                         AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         IsEnabled="{Binding EnableAppFilter}" />
+                                <TextBlock TextWrapping="Wrap" Margin="5,5,5,0" FontSize="11" Foreground="Gray">
+                                    Example: chrome, excel, devenv, blender. Overlay will be hidden when focus shifts to blacklisted apps (or out of whitelisted ones).
+                                </TextBlock>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
         </TabControl>
         <StackPanel Grid.Column="0"
                     Grid.Row="1"

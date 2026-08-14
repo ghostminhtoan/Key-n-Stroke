@@ -163,6 +163,24 @@ namespace KeyNStroke
 
             if (e.StrokeType != KeystrokeType.Undefined)
             {
+                // Password Filter: If EnablePasswordFilter is true, mask normal text characters with '*'
+                SettingsStore s = ((App)Application.Current).MainWindow?.DataContext as SettingsStore;
+                if (s == null)
+                {
+                    // Fallback to try load App.Current settings
+                    try { s = (SettingsStore)Application.Current.FindResource("settings"); } catch {}
+                }
+                
+                if (s != null && s.EnablePasswordFilter)
+                {
+                    // Mask alphanumeric text characters with '*'
+                    if (e.StrokeType == KeystrokeType.Text && !string.IsNullOrEmpty(e.TextModeString) && e.TextModeString.Length == 1 && (e.IsAlpha || e.IsNumeric))
+                    {
+                        e.TextModeString = "*";
+                        e.ShortcutString = e.ShortcutString?.Replace(e.Key.ToString().ToUpper(), "*");
+                    }
+                }
+
                 OnKeystrokeEvent(e);
             }
 

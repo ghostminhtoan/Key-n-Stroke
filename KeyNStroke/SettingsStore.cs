@@ -238,8 +238,12 @@ namespace KeyNStroke
         [DataMember] public String toggleKeystrokeHistoryShortcut = null;
         [DataMember] public String toggleUiShortcut = null;
         [DataMember] public Nullable<bool> globalKey = null;
-
-
+        [DataMember] public Nullable<bool> enableAutoHide = null;
+        [DataMember] public Nullable<double> autoHideTimeout = null;
+        [DataMember] public Nullable<bool> enableAppFilter = null;
+        [DataMember] public Nullable<bool> useWhitelistMode = null;
+        [DataMember] public string filterAppsList = null;
+        [DataMember] public Nullable<bool> enablePasswordFilter = null;
     }
 
     #endregion
@@ -717,6 +721,48 @@ namespace KeyNStroke
             set { i.globalKey = value; OnSettingChanged("GlobalKey"); }
         }
 
+        public bool EnableAutoHideDefault = false;
+        public bool EnableAutoHide
+        {
+            get { return Or(i.enableAutoHide, EnableAutoHideDefault); }
+            set { i.enableAutoHide = value; OnSettingChanged("EnableAutoHide"); }
+        }
+
+        public double AutoHideTimeoutDefault = 5.0; // seconds
+        public double AutoHideTimeout
+        {
+            get { return Or(i.autoHideTimeout, AutoHideTimeoutDefault); }
+            set { i.autoHideTimeout = value; OnSettingChanged("AutoHideTimeout"); }
+        }
+
+        public bool EnableAppFilterDefault = false;
+        public bool EnableAppFilter
+        {
+            get { return Or(i.enableAppFilter, EnableAppFilterDefault); }
+            set { i.enableAppFilter = value; OnSettingChanged("EnableAppFilter"); }
+        }
+
+        public bool UseWhitelistModeDefault = false; // false = Blacklist, true = Whitelist
+        public bool UseWhitelistMode
+        {
+            get { return Or(i.useWhitelistMode, UseWhitelistModeDefault); }
+            set { i.useWhitelistMode = value; OnSettingChanged("UseWhitelistMode"); }
+        }
+
+        public string FilterAppsListDefault = "devenv, excel, chrome";
+        public string FilterAppsList
+        {
+            get { return Or(i.filterAppsList, FilterAppsListDefault); }
+            set { i.filterAppsList = value; OnSettingChanged("FilterAppsList"); }
+        }
+
+        public bool EnablePasswordFilterDefault = true;
+        public bool EnablePasswordFilter
+        {
+            get { return Or(i.enablePasswordFilter, EnablePasswordFilterDefault); }
+            set { i.enablePasswordFilter = value; OnSettingChanged("EnablePasswordFilter"); }
+        }
+
         // Add new settings also to method CallPropertyChangedForAllProperties()
 
         #endregion
@@ -787,8 +833,13 @@ namespace KeyNStroke
                 PropertyChanged(this, new PropertyChangedEventArgs("Standby"));
                 PropertyChanged(this, new PropertyChangedEventArgs("WelcomeOnStartup"));
                 PropertyChanged(this, new PropertyChangedEventArgs("ToggleKeystrokeHistoryShortcut"));
-                PropertyChanged(this, new PropertyChangedEventArgs("ToggleUiShortcut"));
                 PropertyChanged(this, new PropertyChangedEventArgs("GlobalKey"));
+                PropertyChanged(this, new PropertyChangedEventArgs("EnableAutoHide"));
+                PropertyChanged(this, new PropertyChangedEventArgs("AutoHideTimeout"));
+                PropertyChanged(this, new PropertyChangedEventArgs("EnableAppFilter"));
+                PropertyChanged(this, new PropertyChangedEventArgs("UseWhitelistMode"));
+                PropertyChanged(this, new PropertyChangedEventArgs("FilterAppsList"));
+                PropertyChanged(this, new PropertyChangedEventArgs("EnablePasswordFilter"));
 
             }
         }
