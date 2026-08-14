@@ -53,7 +53,7 @@ namespace KeyNStroke
         private void InitTimers()
         {
             appFilterTimer = new System.Windows.Threading.DispatcherTimer();
-            appFilterTimer.Interval = TimeSpan.FromMilliseconds(500);
+            UpdateTimerIntervals();
             appFilterTimer.Tick += AppFilterTimer_Tick;
             appFilterTimer.Start();
 
@@ -61,6 +61,14 @@ namespace KeyNStroke
             autoHideTimer.Interval = TimeSpan.FromMilliseconds(500);
             autoHideTimer.Tick += AutoHideTimer_Tick;
             autoHideTimer.Start();
+        }
+
+        private void UpdateTimerIntervals()
+        {
+            if (mySettings != null && appFilterTimer != null)
+            {
+                appFilterTimer.Interval = TimeSpan.FromSeconds(mySettings.HistoryTimeout);
+            }
         }
 
         [DllImport("user32.dll")]
@@ -129,7 +137,7 @@ namespace KeyNStroke
             if (mySettings == null) return;
             if (!mySettings.EnableAutoHide) return;
 
-            if ((DateTime.Now - lastActivityTime).TotalSeconds >= mySettings.AutoHideTimeout)
+            if ((DateTime.Now - lastActivityTime).TotalSeconds >= mySettings.HistoryTimeout)
             {
                 if (KeystrokeHistoryWindow != null && KeystrokeHistoryWindow.IsVisible)
                 {
@@ -557,6 +565,9 @@ namespace KeyNStroke
                 case "FilterAppsList":
                 case "EnableAutoHide":
                     UpdateWindowsVisibility();
+                    break;
+                case "HistoryTimeout":
+                    UpdateTimerIntervals();
                     break;
                 case "Standby":
                     OnCursorIndicatorSettingChanged();
