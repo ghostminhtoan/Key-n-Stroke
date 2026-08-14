@@ -247,6 +247,11 @@ namespace KeyNStroke
         [DataMember] public string blacklistedAppsList = null;
         [DataMember] public string whitelistedAppsList = null;
         [DataMember] public Nullable<bool> enablePasswordFilter = null;
+        [DataMember] public SerializableColor2 presetLabelColor = null;
+        [DataMember] public SerializableColor2 presetBackgroundColor = null;
+        [DataMember] public Nullable<double> presetLineDistance = null;
+        [DataMember] public Nullable<int> presetHistoryLength = null;
+        [DataMember] public Nullable<Style> presetLabelAnimation = null;
     }
 
     #endregion
@@ -778,6 +783,34 @@ namespace KeyNStroke
         {
             get { return Or(i.enablePasswordFilter, EnablePasswordFilterDefault); }
             set { i.enablePasswordFilter = value; OnSettingChanged("EnablePasswordFilter"); }
+        }
+
+        public void SavePreset()
+        {
+            i.presetLabelColor = new SerializableColor2(LabelColor);
+            i.presetBackgroundColor = new SerializableColor2(BackgroundColor);
+            i.presetLineDistance = LineDistance;
+            i.presetHistoryLength = HistoryLength;
+            i.presetLabelAnimation = LabelAnimation;
+            dirty = true;
+        }
+
+        public void LoadPreset()
+        {
+            LabelColor = Or(i.presetLabelColor, LabelColorDefault);
+            BackgroundColor = Or(i.presetBackgroundColor, BackgroundColorDefault);
+            LineDistance = Or(i.presetLineDistance, LineDistanceDefault);
+            HistoryLength = Or(i.presetHistoryLength, HistoryLengthDefault);
+            LabelAnimation = Or(i.presetLabelAnimation, LabelAnimationDefault);
+        }
+
+        public void ResetDefaultPreset()
+        {
+            LabelColor = LabelColorDefault;
+            BackgroundColor = BackgroundColorDefault;
+            LineDistance = LineDistanceDefault;
+            HistoryLength = HistoryLengthDefault;
+            LabelAnimation = LabelAnimationDefault;
         }
 
         // Add new settings also to method CallPropertyChangedForAllProperties()

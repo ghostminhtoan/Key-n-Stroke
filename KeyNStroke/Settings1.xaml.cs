@@ -182,6 +182,21 @@ namespace KeyNStroke
             settings.LabelAnimation = KeyNStroke.Style.Slide;
         }
 
+        private void PresetSave_Click(object sender, RoutedEventArgs e)
+        {
+            settings.SavePreset();
+        }
+
+        private void PresetLoad_Click(object sender, RoutedEventArgs e)
+        {
+            settings.LoadPreset();
+        }
+
+        private void PresetResetDefault_Click(object sender, RoutedEventArgs e)
+        {
+            settings.ResetDefaultPreset();
+        }
+
         #region Shortcut - ChangeResizeMove
 
         private void Hyperlink_ChangeResizeMoveShortcut(object sender, RoutedEventArgs e)

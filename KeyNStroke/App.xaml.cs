@@ -109,6 +109,7 @@ namespace KeyNStroke
             if (string.IsNullOrEmpty(activeProc))
             {
                 filterModeAllows = true;
+                SetKeystrokeHistoryFromAppFilter(true);
                 UpdateWindowsVisibility();
                 return;
             }
@@ -129,7 +130,16 @@ namespace KeyNStroke
                 filterModeAllows = !inList;
             }
 
+            SetKeystrokeHistoryFromAppFilter(filterModeAllows);
             UpdateWindowsVisibility();
+        }
+
+        private void SetKeystrokeHistoryFromAppFilter(bool enabled)
+        {
+            if (mySettings.EnableKeystrokeHistory != enabled)
+            {
+                mySettings.EnableKeystrokeHistory = enabled;
+            }
         }
 
         private void AutoHideTimer_Tick(object sender, EventArgs e)

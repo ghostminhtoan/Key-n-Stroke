@@ -209,6 +209,15 @@
                                 <Button Content="Presentation"
                                         Click="PresetPresentation_Click"
                                         Margin="0,0,5,5" />
+                                <Button Content="Save"
+                                        Click="PresetSave_Click"
+                                        Margin="0,0,5,5" />
+                                <Button Content="Load"
+                                        Click="PresetLoad_Click"
+                                        Margin="0,0,5,5" />
+                                <Button Content="Reset Default"
+                                        Click="PresetResetDefault_Click"
+                                        Margin="0,0,5,5" />
                             </WrapPanel>
                         </GroupBox>
                     </StackPanel>
