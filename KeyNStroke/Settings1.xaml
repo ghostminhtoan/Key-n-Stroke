@@ -171,11 +171,45 @@
                                              Content="no animation"
                                              GroupName="style"
                                              IsChecked="{Binding LabelAnimation, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static uc:Style.NoAnimation}}" />
+                                <RadioButton x:Name="rb_style_fade"
+                                             Content="fade"
+                                             GroupName="style"
+                                             IsChecked="{Binding LabelAnimation, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static uc:Style.Fade}}" />
                                 <RadioButton x:Name="rb_style_slide"
                                              Content="slide"
                                              GroupName="style"
                                              IsChecked="{Binding LabelAnimation, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static uc:Style.Slide}}" />
                             </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Preview">
+                            <Border Margin="5"
+                                    Padding="8">
+                                <Border.Background>
+                                    <SolidColorBrush Color="{Binding BackgroundColor, Converter={StaticResource MediaColorDrawingColorConverter}}" />
+                                </Border.Background>
+                                <TextBlock Text="Ctrl + K"
+                                           FontFamily="{Binding LabelFont.Family}"
+                                           FontSize="{Binding LabelFont.Size}"
+                                           FontStyle="{Binding LabelFont.Style}"
+                                           FontWeight="{Binding LabelFont.Weight}">
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="{Binding LabelColor, Converter={StaticResource MediaColorDrawingColorConverter}}" />
+                                    </TextBlock.Foreground>
+                                </TextBlock>
+                            </Border>
+                        </GroupBox>
+                        <GroupBox Header="Quick Presets">
+                            <WrapPanel Margin="5">
+                                <Button Content="Gaming"
+                                        Click="PresetGaming_Click"
+                                        Margin="0,0,5,5" />
+                                <Button Content="Coding"
+                                        Click="PresetCoding_Click"
+                                        Margin="0,0,5,5" />
+                                <Button Content="Presentation"
+                                        Click="PresetPresentation_Click"
+                                        Margin="0,0,5,5" />
+                            </WrapPanel>
                         </GroupBox>
                     </StackPanel>
                     <StackPanel Margin="5"
@@ -499,9 +533,17 @@
                                           IsChecked="{Binding UseWhitelistMode}"
                                           Margin="15,5,0,0"
                                           IsEnabled="{Binding EnableAppFilter}">Use Whitelist mode (Only show in these apps)</CheckBox>
-                                <TextBlock TextWrapping="Wrap" Margin="5,10,5,0">List of App process names (comma separated):</TextBlock>
-                                <TextBox x:Name="tb_filterAppsList"
-                                         Text="{Binding FilterAppsList, Mode=TwoWay}"
+                                <TextBlock TextWrapping="Wrap" Margin="5,10,5,0">Blacklist process names (comma separated):</TextBlock>
+                                <TextBox x:Name="tb_blacklistedAppsList"
+                                         Text="{Binding BlacklistedAppsList, Mode=TwoWay}"
+                                         Margin="5"
+                                         Height="40"
+                                         AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         IsEnabled="{Binding EnableAppFilter}" />
+                                <TextBlock TextWrapping="Wrap" Margin="5,10,5,0">Whitelist process names (comma separated):</TextBlock>
+                                <TextBox x:Name="tb_whitelistedAppsList"
+                                         Text="{Binding WhitelistedAppsList, Mode=TwoWay}"
                                          Margin="5"
                                          Height="40"
                                          AcceptsReturn="True"

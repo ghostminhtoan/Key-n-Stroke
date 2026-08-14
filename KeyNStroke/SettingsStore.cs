@@ -34,6 +34,7 @@ namespace KeyNStroke
     public enum Style
     {
         NoAnimation,
+        Fade,
         Slide
     }
 
@@ -243,6 +244,8 @@ namespace KeyNStroke
         [DataMember] public Nullable<bool> enableAppFilter = null;
         [DataMember] public Nullable<bool> useWhitelistMode = null;
         [DataMember] public string filterAppsList = null;
+        [DataMember] public string blacklistedAppsList = null;
+        [DataMember] public string whitelistedAppsList = null;
         [DataMember] public Nullable<bool> enablePasswordFilter = null;
     }
 
@@ -756,6 +759,20 @@ namespace KeyNStroke
             set { i.filterAppsList = value; OnSettingChanged("FilterAppsList"); }
         }
 
+        public string BlacklistedAppsListDefault = "devenv, excel, chrome";
+        public string BlacklistedAppsList
+        {
+            get { return Or(i.blacklistedAppsList, UseWhitelistMode ? "" : Or(i.filterAppsList, BlacklistedAppsListDefault)); }
+            set { i.blacklistedAppsList = value; OnSettingChanged("BlacklistedAppsList"); }
+        }
+
+        public string WhitelistedAppsListDefault = "";
+        public string WhitelistedAppsList
+        {
+            get { return Or(i.whitelistedAppsList, UseWhitelistMode ? Or(i.filterAppsList, WhitelistedAppsListDefault) : WhitelistedAppsListDefault); }
+            set { i.whitelistedAppsList = value; OnSettingChanged("WhitelistedAppsList"); }
+        }
+
         public bool EnablePasswordFilterDefault = true;
         public bool EnablePasswordFilter
         {
@@ -839,6 +856,8 @@ namespace KeyNStroke
                 PropertyChanged(this, new PropertyChangedEventArgs("EnableAppFilter"));
                 PropertyChanged(this, new PropertyChangedEventArgs("UseWhitelistMode"));
                 PropertyChanged(this, new PropertyChangedEventArgs("FilterAppsList"));
+                PropertyChanged(this, new PropertyChangedEventArgs("BlacklistedAppsList"));
+                PropertyChanged(this, new PropertyChangedEventArgs("WhitelistedAppsList"));
                 PropertyChanged(this, new PropertyChangedEventArgs("EnablePasswordFilter"));
 
             }

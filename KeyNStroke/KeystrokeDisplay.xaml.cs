@@ -596,6 +596,7 @@ namespace KeyNStroke
         {
             if (this.SettingsModeActivated)
             {
+                SnapWindowToScreenEdge();
                 settings.WindowLocation = new Point(this.Left, this.Top);
             }
         }
@@ -631,7 +632,30 @@ namespace KeyNStroke
         private void InnerPanel_MouseUp(object sender, MouseButtonEventArgs e)
         {
             InnerPanelIsDragging = false;
+            SnapInnerPanelToEdge();
             settings.PanelLocation = new Point(innerPanel.Margin.Left, innerPanel.Margin.Top);
+        }
+
+        private void SnapWindowToScreenEdge()
+        {
+            const double snap = 20.0;
+            Rect work = SystemParameters.WorkArea;
+            if (Math.Abs(Left - work.Left) <= snap) Left = work.Left;
+            if (Math.Abs(Top - work.Top) <= snap) Top = work.Top;
+            if (Math.Abs((Left + Width) - work.Right) <= snap) Left = work.Right - Width;
+            if (Math.Abs((Top + Height) - work.Bottom) <= snap) Top = work.Bottom - Height;
+        }
+
+        private void SnapInnerPanelToEdge()
+        {
+            const double snap = 20.0;
+            double left = innerPanel.Margin.Left;
+            double top = innerPanel.Margin.Top;
+            if (Math.Abs(left) <= snap) left = 0;
+            if (Math.Abs(top) <= snap) top = 0;
+            if (Math.Abs((left + innerPanel.Width) - ActualWidth) <= snap) left = ActualWidth - innerPanel.Width;
+            if (Math.Abs((top + innerPanel.Height) - ActualHeight) <= snap) top = ActualHeight - innerPanel.Height;
+            innerPanel.Margin = new Thickness(Math.Max(0, left), Math.Max(0, top), 0, 0);
         }
 
 
@@ -726,7 +750,7 @@ namespace KeyNStroke
                 historyTimeout = null,
             };
 
-            if (settings.LabelAnimation == KeyNStroke.Style.Slide)
+            if (settings.LabelAnimation == KeyNStroke.Style.Slide || settings.LabelAnimation == KeyNStroke.Style.Fade)
             {
                 Storyboard showLabelSB = new Storyboard();
                 var fadeInAnimation = new DoubleAnimation
@@ -739,25 +763,28 @@ namespace KeyNStroke
                 Storyboard.SetTarget(fadeInAnimation, next);
                 Storyboard.SetTargetProperty(fadeInAnimation, new PropertyPath(Label.OpacityProperty));
 
-                Thickness targetMargin = next.Margin; // from ApplyLabelStyle
-                if (settings.LabelTextDirection == TextDirection.Down)
+                if (settings.LabelAnimation == KeyNStroke.Style.Slide)
                 {
-                    next.Margin = new Thickness(0, 0, 0, -next.Height);
-                }
-                else
-                {
-                    next.Margin = new Thickness(0, -next.Height, 0, 0);
-                }
+                    Thickness targetMargin = next.Margin; // from ApplyLabelStyle
+                    if (settings.LabelTextDirection == TextDirection.Down)
+                    {
+                        next.Margin = new Thickness(0, 0, 0, -next.Height);
+                    }
+                    else
+                    {
+                        next.Margin = new Thickness(0, -next.Height, 0, 0);
+                    }
 
-                var pushUpwardsAnimation = new ThicknessAnimation
-                {
-                    From = next.Margin,
-                    To = targetMargin,
-                    Duration = new Duration(TimeSpan.FromMilliseconds(200))
-                };
-                showLabelSB.Children.Add(pushUpwardsAnimation);
-                Storyboard.SetTarget(pushUpwardsAnimation, next);
-                Storyboard.SetTargetProperty(pushUpwardsAnimation, new PropertyPath(Label.MarginProperty));
+                    var pushUpwardsAnimation = new ThicknessAnimation
+                    {
+                        From = next.Margin,
+                        To = targetMargin,
+                        Duration = new Duration(TimeSpan.FromMilliseconds(200))
+                    };
+                    showLabelSB.Children.Add(pushUpwardsAnimation);
+                    Storyboard.SetTarget(pushUpwardsAnimation, next);
+                    Storyboard.SetTargetProperty(pushUpwardsAnimation, new PropertyPath(Label.MarginProperty));
+                }
 
                 pack.storyboard = showLabelSB;
                 pack.storyboard.Begin(pack.label);
@@ -806,7 +833,7 @@ namespace KeyNStroke
                 toRemove.storyboard.Remove(toRemove.label);
             }
 
-            if (settings.LabelAnimation == KeyNStroke.Style.Slide)
+            if (settings.LabelAnimation == KeyNStroke.Style.Slide || settings.LabelAnimation == KeyNStroke.Style.Fade)
             {
                 Storyboard hideLabelSB = new Storyboard();
                 var fadeOutAnimation = new DoubleAnimation

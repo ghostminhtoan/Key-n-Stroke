@@ -113,7 +113,7 @@ namespace KeyNStroke
                 return;
             }
 
-            string[] list = (mySettings.FilterAppsList ?? "")
+            string[] list = ((mySettings.UseWhitelistMode ? mySettings.WhitelistedAppsList : mySettings.BlacklistedAppsList) ?? "")
                 .Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Trim())
                 .ToArray();
@@ -563,6 +563,8 @@ namespace KeyNStroke
                 case "EnableAppFilter":
                 case "UseWhitelistMode":
                 case "FilterAppsList":
+                case "BlacklistedAppsList":
+                case "WhitelistedAppsList":
                 case "EnableAutoHide":
                     UpdateWindowsVisibility();
                     break;

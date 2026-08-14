@@ -155,6 +155,33 @@ namespace KeyNStroke
             sampleText.Foreground = new SolidColorBrush(UIHelper.ToMediaColor(settings.LabelColor));
         }
 
+        private void PresetGaming_Click(object sender, RoutedEventArgs e)
+        {
+            settings.LabelColor = System.Drawing.Color.FromArgb(255, 80, 255, 120);
+            settings.BackgroundColor = System.Drawing.Color.FromArgb(180, 0, 0, 0);
+            settings.LineDistance = 38;
+            settings.HistoryLength = 4;
+            settings.LabelAnimation = KeyNStroke.Style.Slide;
+        }
+
+        private void PresetCoding_Click(object sender, RoutedEventArgs e)
+        {
+            settings.LabelColor = System.Drawing.Color.White;
+            settings.BackgroundColor = System.Drawing.Color.FromArgb(160, 20, 20, 20);
+            settings.LineDistance = 34;
+            settings.HistoryLength = 5;
+            settings.LabelAnimation = KeyNStroke.Style.Fade;
+        }
+
+        private void PresetPresentation_Click(object sender, RoutedEventArgs e)
+        {
+            settings.LabelColor = System.Drawing.Color.FromArgb(255, 255, 245, 180);
+            settings.BackgroundColor = System.Drawing.Color.FromArgb(210, 0, 0, 0);
+            settings.LineDistance = 46;
+            settings.HistoryLength = 3;
+            settings.LabelAnimation = KeyNStroke.Style.Slide;
+        }
+
         #region Shortcut - ChangeResizeMove
 
         private void Hyperlink_ChangeResizeMoveShortcut(object sender, RoutedEventArgs e)
