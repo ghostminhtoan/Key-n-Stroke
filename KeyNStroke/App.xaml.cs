@@ -552,6 +552,12 @@ namespace KeyNStroke
                         myKeyboardHook.GlobalKeyEnabled = mySettings.GlobalKey;
                     }
                     break;
+                case "EnableAppFilter":
+                case "UseWhitelistMode":
+                case "FilterAppsList":
+                case "EnableAutoHide":
+                    UpdateWindowsVisibility();
+                    break;
                 case "Standby":
                     OnCursorIndicatorSettingChanged();
                     OnButtonIndicatorSettingChanged();
